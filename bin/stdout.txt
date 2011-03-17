@@ -1,0 +1,11 @@
+init: sdl
+init: net
+init: game
+init: video: mode
+init: video: misc
+init: gl
+Renderer: ATI Mobility Radeon X1400 (ATI Technologies Inc.)
+Driver: 2.1.8304 Release
+Rendering using the OpenGL assembly/GLSL shader path.
+could not load texture packages\textures\notexture.png
+could not find core textures
