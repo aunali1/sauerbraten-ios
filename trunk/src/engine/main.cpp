@@ -1216,8 +1216,8 @@ int SDL_main(int argc, char **argv) {
         desktoph = video->current_h;
     }
 #else
-        desktopw = 1024;
-        desktoph = 768;
+        desktopw = 480;
+        desktoph = 320;
 #endif
     int usedcolorbits = 0, useddepthbits = 0, usedfsaa = 0;
     setupscreen(usedcolorbits, useddepthbits, usedfsaa);
