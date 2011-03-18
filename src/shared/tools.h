@@ -27,7 +27,6 @@ typedef unsigned int uint;
 #else
 #define RESTRICT
 #endif
-
 #ifdef swap
 #undef swap
 #endif
@@ -54,7 +53,6 @@ static inline T min(T a, T b)
 {
     return a < b ? a : b;
 }
-
 #define clamp(a,b,c) (max(b, min(a, c)))
 #define rnd(x) ((int)(randomMT()&0xFFFFFF)%(x))
 #define rndscale(x) (float((randomMT()&0xFFFFFF)*double(x)/double(0xFFFFFF)))

@@ -28,13 +28,15 @@
 #include "scale.h"
 
 #ifndef WIN32
-#include "MacUtils.h"
 #define LOADPVR
 #endif
 #ifdef LOADPVR
 #include "PVRTTextureAPI.h"
 #include "PVRTTexture.h"
 #endif
+
+SDL_Surface *loadsurface(const char *name);
+std::string GetBaseAppPath();
 
 static void scaletexture(uchar *src, uint sw, uint sh, uint bpp, uint pitch, uchar *dst, uint dw, uint dh) {
     if(sw == dw*2 && sh == dh*2) {
@@ -838,26 +840,7 @@ bool canloadsurface(const char *name)
     return true;
 }
 
-SDL_Surface *loadsurface(const char *name) {
-    SDL_Surface *s = NULL;
-    stream *z = openzipfile(name, "rb");
-    if(z) {
-        SDL_RWops *rw = z->rwops();
-        if(rw) {
-            s = IMG_Load_RW(rw, 0);
-            SDL_FreeRW(rw);
-        }
-        delete z;
-    }
-#ifdef WIN32
-    if(!s) s = IMG_Load(findfile(name, "rb"));
-#else
-	std::string Tmp = GetBaseAppPath() + name;
-	if(!s) s = IMG_Load(Tmp.c_str());
-#endif
-    return fixsurfaceformat(s);
-}
-   
+  
 static vec parsevec(const char *arg)
 {
     vec v(0, 0, 0);
@@ -1141,7 +1124,8 @@ static Texture *newtexturepvrt(Texture *t, const char *rname, char *fbuf, int cl
     int filter = !canreduce || reducefilter ? (mipit ? 2 : 1) : 0;
 	PVR_Texture_Header Header;
 	GLuint TexName;
-	unsigned int Result = PVRTTextureLoadFromPointer(fbuf, &TexName, &Header, false, false);
+	//unsigned int Result = PVRTTextureLoadFromPointer(fbuf, &TexName, &Header, false, false);
+	unsigned int Result = PVRTLoadTextureFromPointer(fbuf, &TexName, &Header);
 	t->id = TexName;
 	t->w = t->xs = Header.dwWidth;
 	t->h = t->ys = Header.dwHeight;
@@ -2968,3 +2952,23 @@ void mergenormalmaps(char *heightfile, char *normalfile) {
 
 COMMAND(flipnormalmapy, "ss");
 COMMAND(mergenormalmaps, "ss");
+
+SDL_Surface *loadsurface(const char *name) {
+    SDL_Surface *s = NULL;
+    stream *z = openzipfile(name, "rb");
+    if(z) {
+        SDL_RWops *rw = z->rwops();
+        if(rw) {
+            s = IMG_Load_RW(rw, 0);
+            SDL_FreeRW(rw);
+        }
+        delete z;
+    }
+#ifdef WIN32
+    if(!s) s = IMG_Load(findfile(name, "rb"));
+#else
+	std::string Tmp = GetBaseAppPath() + name;
+	if(!s) s = IMG_Load(Tmp.c_str());
+#endif
+    return fixsurfaceformat(s);
+}
