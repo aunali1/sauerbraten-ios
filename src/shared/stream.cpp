@@ -246,31 +246,20 @@ int listfiles(const char *dir, const char *ext, vector<char *> &files)
 }
 
 #ifndef STANDALONE
-#ifdef WIN32
-static int rwopsseek(SDL_RWops *rw, int offset, int whence)
-#else
 static long rwopsseek(SDL_RWops *rw, long offset, int whence)
-#endif
 {
     stream *f = (stream *)rw->hidden.unknown.data1;
     if((!offset && whence==SEEK_CUR) || f->seek(offset, whence)) return f->tell();
     return -1;
 }
 
-#ifdef WIN32
-static int rwopsread(SDL_RWops *rw, void *buf, int size, int nmemb)
-#else
 static size_t rwopsread(SDL_RWops *rw, void *buf, size_t size, size_t nmemb)
-#endif
 {
     stream *f = (stream *)rw->hidden.unknown.data1;
     return f->read(buf, size*nmemb)/size;
 }
-#ifdef WIN32
-static int rwopswrite(SDL_RWops *rw, const void *buf, int size, int nmemb)
-#else
+
 static size_t rwopswrite(SDL_RWops *rw, const void *buf, size_t size, size_t nmemb)
-#endif
 {
     stream *f = (stream *)rw->hidden.unknown.data1;
     return f->write(buf, size*nmemb)/size;

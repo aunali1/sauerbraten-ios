@@ -36,7 +36,9 @@
 #endif
 
 SDL_Surface *loadsurface(const char *name);
+#ifndef WIN32
 std::string GetBaseAppPath();
+#endif
 
 static void scaletexture(uchar *src, uint sw, uint sh, uint bpp, uint pitch, uchar *dst, uint dw, uint dh) {
     if(sw == dw*2 && sh == dh*2) {
@@ -684,13 +686,13 @@ SDL_Surface *creatergbasurface(SDL_Surface *os) {
 bool checkgrayscale(SDL_Surface *s)
 {
 #ifdef WIN32
-    // gray scale images have 256 levels, no colorkey, and the palette is a ramp
-    if(s->format->palette)
-    {
-        if(s->format->palette->ncolors != 256 || s->format->colorkey) return false;
-        const SDL_Color *colors = s->format->palette->colors;
-        loopi(256) if(colors[i].r != i || colors[i].g != i || colors[i].b != i) return false;
-    }
+    //// gray scale images have 256 levels, no colorkey, and the palette is a ramp
+    //if(s->format->palette)
+    //{
+    //    if(s->format->palette->ncolors != 256 || s->format->colorkey) return false;
+    //    const SDL_Color *colors = s->format->palette->colors;
+    //    loopi(256) if(colors[i].r != i || colors[i].g != i || colors[i].b != i) return false;
+    //}
     return true;
 #else
 	return false;
@@ -710,7 +712,7 @@ SDL_Surface *fixsurfaceformat(SDL_Surface *s)
     {
 #ifdef WIN32
         case 1:
-            if(!checkgrayscale(s)) return s->format->colorkey ? creatergbasurface(s) : creatergbsurface(s);
+            /*if(!checkgrayscale(s)) return s->format->colorkey ? creatergbasurface(s) : creatergbsurface(s);*/
             break;
 #endif
         case 3:
@@ -1124,8 +1126,8 @@ static Texture *newtexturepvrt(Texture *t, const char *rname, char *fbuf, int cl
     int filter = !canreduce || reducefilter ? (mipit ? 2 : 1) : 0;
 	PVR_Texture_Header Header;
 	GLuint TexName;
-	//unsigned int Result = PVRTTextureLoadFromPointer(fbuf, &TexName, &Header, false, false);
-	unsigned int Result = PVRTLoadTextureFromPointer(fbuf, &TexName, &Header);
+	unsigned int Result = PVRTTextureLoadFromPointer(fbuf, &TexName, &Header, false, false);
+	//unsigned int Result = PVRTLoadTextureFromPointer(fbuf, &TexName, &Header);
 	t->id = TexName;
 	t->w = t->xs = Header.dwWidth;
 	t->h = t->ys = Header.dwHeight;

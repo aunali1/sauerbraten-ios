@@ -110,8 +110,8 @@ struct font {
 
 #define FONTH (curfont->defaulth)
 #define FONTW (curfont->defaultw)
-#define MINRESW 640
-#define MINRESH 480
+#define MINRESW 480
+#define MINRESH 320
 
 extern font *curfont;
 extern int hwtexsize, hwcubetexsize, hwmaxaniso, maxtexsize;

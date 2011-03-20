@@ -45,18 +45,18 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#define SCREENW 1024
-#define SCREENH 768
-#define TOUCHMOVEX 160
-#define TOUCHMOVEY 608
-#define TOUCHFIREX 864
-#define TOUCHFIREY 608
-#define TOUCHSWAPX 864
-#define TOUCHSWAPY 160
-#define TOUCHSIZE 128
+#define SCREENW 480
+#define SCREENH 320
+#define TOUCHMOVEX 32
+#define TOUCHMOVEY 288
+#define TOUCHFIREX 448
+#define TOUCHFIREY 288
+#define TOUCHSWAPX 448
+#define TOUCHSWAPY 32
+#define TOUCHSIZE 32
 #define TOUCHRANGE 32
 
-//#define SUPPORTONSCREENBUTTON
+#define SUPPORTONSCREENBUTTON
 //#define SUPPORTSOUND
 //#define SUPPORTVBO
 //#define SUPPORTSHADER
@@ -74,7 +74,7 @@
 #define NO_SDL_GLEXT
 #include <SDL_opengl.h>
 #undef __glext_h__
-#include "GL/glext.h"
+#include "gl/glext.h"
 #else
 #include "SDL_opengles.h"
 #include <OpenGLES/es1/gl.h>

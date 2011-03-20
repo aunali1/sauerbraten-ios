@@ -1875,9 +1875,10 @@ void gl_drawframe(int w, int h)
 void gl_drawmainmenu(int w, int h)
 {
     xtravertsva = xtraverts = glde = gbatches = 0;
+	glClearColor(1, 0, 0, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     renderbackground(NULL, NULL, NULL, NULL, true, true);
-    renderpostfx();    
+    renderpostfx();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
@@ -2176,7 +2177,7 @@ void drawcrosshair(int w, int h, bool Cursor) {
 		if(!Buttons) {
 			Buttons = textureload("data/buttons.png", 1, false);
 		} else {
-			float chsize = 128 * w / SCREENW;
+			float chsize = TOUCHSIZE * 2;
 			{
 				float x = TOUCHMOVEX - chsize / 2.0f;
 				float y = TOUCHMOVEY - chsize / 2.0f;
