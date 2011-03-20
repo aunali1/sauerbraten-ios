@@ -73,12 +73,12 @@ bool initwarning(const char *desc, int level, int type) {
     return false;
 }
 
-#define SCR_MINW 320
-#define SCR_MINH 200
+#define SCR_MINW 480
+#define SCR_MINH 320
 #define SCR_MAXW 10000
 #define SCR_MAXH 10000
-#define SCR_DEFAULTW 1024
-#define SCR_DEFAULTH 768
+#define SCR_DEFAULTW 480
+#define SCR_DEFAULTH 320
 VARF(scr_w, SCR_MINW, -1, SCR_MAXW, initwarning("screen resolution"));
 VARF(scr_h, SCR_MINH, -1, SCR_MAXH, initwarning("screen resolution"));
 VARF(colorbits, 0, 0, 32, initwarning("color depth"));
@@ -733,7 +733,7 @@ void setupscreen(int &usedcolorbits, int &useddepthbits, int &usedfsaa)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 #ifdef WIN32	
 #if SDL_VERSION_ATLEAST(1, 2, 11)
-    if(vsync>=0) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);
+    /*if(vsync>=0) SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, vsync);*/
 #endif
 #endif
     static int configs[] =
@@ -780,10 +780,8 @@ void setupscreen(int &usedcolorbits, int &useddepthbits, int &usedfsaa)
         if(stencilbits && (config&2)==0) conoutf(CON_WARN, "Stencil buffer not supported - disabling");
         if(fsaa>0 && (config&4)==0) conoutf(CON_WARN, "%dx anti-aliasing not supported - disabling", fsaa);
     }
-
     scr_w = screen->w;
     scr_h = screen->h;
-
     usedcolorbits = hasbpp ? colorbits : 0;
     useddepthbits = config&1 ? depthbits : 0;
     usedfsaa = config&4 ? fsaa : 0;
@@ -898,7 +896,7 @@ static void resetmousemotion() {
 static inline bool skipmousemotion(SDL_Event &event) {
     if(event.type != SDL_MOUSEMOTION) return true;
 #ifndef WIN32
-    if(!(screen->flags&SDL_FULLSCREEN)) {
+    if(!(screen->flags & SDL_FULLSCREEN)) {
 #ifdef __APPLE__
         if(event.motion.y == 0) return true;  // let mac users drag windows via the title bar
 #endif
@@ -964,7 +962,10 @@ void checkinput() {
 				}
                 break;
             case SDL_MOUSEMOTION:
-                if(ignoremouse) { ignoremouse--; break; }
+                if(ignoremouse) { 
+					ignoremouse--; 
+					break; 
+				}
                 if(grabinput && !skipmousemotion(event)) {
                     int dx = event.motion.xrel, dy = event.motion.yrel;
                     checkmousemotion(dx, dy);
@@ -1127,20 +1128,17 @@ int main(int argc, char **argv) {
 #else
 int SDL_main(int argc, char **argv) {
 #endif
-    #ifdef WIN32
+#ifdef WIN32
     //atexit((void (__cdecl *)(void))_CrtDumpMemoryLeaks);
-    #ifndef _DEBUG
-    #ifndef __GNUC__
+#ifndef _DEBUG
+#ifndef __GNUC__
     __try {
-    #endif
-    #endif
-    #endif
-
+#endif
+#endif
+#endif
     int dedicated = 0;
     char *load = NULL, *initscript = NULL;
-
-    #define log(s) puts("init: " s)
-
+#define log(s) puts("init: " s)
     initing = INIT_RESET;
     for(int i = 1; i<argc; i++)
     {
@@ -1216,8 +1214,8 @@ int SDL_main(int argc, char **argv) {
         desktoph = video->current_h;
     }
 #else
-        desktopw = 480;
-        desktoph = 320;
+	desktopw = SCREENW;
+	desktoph = SCREENH;
 #endif
     int usedcolorbits = 0, useddepthbits = 0, usedfsaa = 0;
     setupscreen(usedcolorbits, useddepthbits, usedfsaa);
@@ -1235,8 +1233,10 @@ int SDL_main(int argc, char **argv) {
 
     log("console");
     persistidents = false;
-    if(!execfile("data/stdlib.cfg", false)) fatal("cannot find data files (you are running from the wrong folder, try .bat file in the main folder)");   // this is the first file we load.
-    if(!execfile("data/font.cfg", false)) fatal("cannot find font definitions");
+    if(!execfile("data/stdlib.cfg", false)) 
+		fatal("cannot find data files (you are running from the wrong folder, try .bat file in the main folder)");   // this is the first file we load.
+    if(!execfile("data/font.cfg", false)) 
+		fatal("cannot find font definitions");
     if(!setfont("default")) fatal("no default font specified");
 
     inbetweenframes = true;

@@ -38,7 +38,7 @@
 			>
 			<DebugSettings
 				Command="$(TargetPath)"
-				WorkingDirectory="C:\1101\iPhone\S2iPhone"
+				WorkingDirectory="U:\Phone\S2iPhone"
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
