@@ -75,10 +75,15 @@
 #include <SDL_opengl.h>
 #undef __glext_h__
 #include "gl/glext.h"
+#elif WEBOS
+#include "SDL.h"
+#include "PDL.h"
+#include <GLES/gl.h>
 #else
 #include "SDL_opengles.h"
 #include <OpenGLES/es1/gl.h>
 #include <OpenGLES/es1/glext.h>
+#endif
 
 #define glGenBuffers_ glGenBuffers
 #define glBindBuffer_ glBindBuffer

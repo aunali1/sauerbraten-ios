@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="sauerbraten"
 	ProjectGUID="{06594C6D-6DA9-49DC-9A91-8F47221DDCFD}"
 	RootNamespace="sauerbraten"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -48,7 +49,7 @@
 				EnableIntrinsicFunctions="false"
 				FavorSizeOrSpeed="2"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\enet\include;..\include;..\engine;..\fpsgame;..\shared"
+				AdditionalIncludeDirectories="..\enet\include;..\enet\include\enet;..\include;..\engine;..\fpsgame;..\shared"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -87,7 +88,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="enet.lib zdll.lib opengl32.lib SDL.lib SDL_image.lib ws2_32.lib SDL_mixer.lib winmm.lib dbghelp.lib kernel32.lib user32.lib"
-				OutputFile="..\..\bin\sauerbraten.exe"
+				OutputFile="..\..\sauerbraten.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
@@ -102,6 +103,8 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -121,9 +124,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -161,8 +161,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\enet\include;..\include;..\engine;..\fpsgame;..\shared"
-				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
+				AdditionalIncludeDirectories="..\enet\include\enet;..\enet\include;..\include;..\engine;..\fpsgame;..\shared;&quot;$(PalmPDK)\include&quot;;&quot;$(PalmPDK)\include\SDL&quot;"
+				PreprocessorDefinitions="WEBOS;SIMULATOR;_DEBUG;_CONSOLE;_ORIGINAL"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="1"
 				RuntimeLibrary="1"
@@ -192,11 +192,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="enet.lib zdll.lib opengl32.lib SDL.lib SDL_image.lib SDL_mixer.lib ws2_32.lib winmm.lib dbghelp.lib kernel32.lib user32.lib"
-				OutputFile="..\..\bin\sauerbraten_debug.exe"
+				AdditionalDependencies="SDLmain.lib SDL.lib SDL_image.lib SDL_net.lib SDL_mixer.lib ws2_32.lib libpdl.lib dgles.lib"
+				OutputFile="..\..\sauerbraten_debug.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\lib"
+				AdditionalLibraryDirectories="&quot;$(PalmPDK)\host\lib&quot;"
 				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/cube_debug.pdb"
@@ -204,6 +204,8 @@
 				HeapReserveSize="0"
 				HeapCommitSize="0"
 				LinkTimeCodeGeneration="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -223,9 +225,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -312,6 +311,8 @@
 				MapExports="true"
 				SubSystem="1"
 				OptimizeForWindows98="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -331,9 +332,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -396,23 +394,7 @@
 				RelativePath=".\SDL_win32_main.c"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Profile|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -2291,6 +2273,82 @@
 						PrecompiledHeaderFile=".\Profile/game.pch"
 					/>
 				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="enet"
+			>
+			<File
+				RelativePath="..\enet\callbacks.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\callbacks.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\compress.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\enet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\etime.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\host.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\packet.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\peer.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\protocol.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\protocol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\unix.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\unix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\utility.h"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\win32.c"
+				>
+			</File>
+			<File
+				RelativePath="..\enet\include\enet\win32.h"
+				>
 			</File>
 		</Filter>
 	</Files>
