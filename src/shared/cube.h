@@ -42,8 +42,8 @@
 #endif
 
 #ifndef STANDALONE
-#include <SDL.h>
-#include <SDL_image.h>
+#include "SDL.h"
+#include "SDL_image.h"
 
 #define SCREENW 480
 #define SCREENH 320
@@ -149,8 +149,6 @@
 #define GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT32_OES
 #define GL_RGB8 GL_RGB8_OES
 #define GL_RGBA8 GL_RGBA8_OES
-#endif
-#else
 #endif
 
 #include "enet.h"
