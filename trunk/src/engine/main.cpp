@@ -938,7 +938,7 @@ void checkinput() {
 			event = events.remove(0);
 		}
 #ifndef WIN32
-		mouseID = event.motion.which;
+		mouseID = 0;
 #endif
         switch(event.type) {
             case SDL_QUIT:
