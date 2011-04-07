@@ -37,7 +37,7 @@
 
 SDL_Surface *loadsurface(const char *name);
 #ifndef WIN32
-std::string GetBaseAppPath();
+std::safe_string GetBaseAppPath();
 #endif
 
 static void scaletexture(uchar *src, uint sw, uint sh, uint bpp, uint pitch, uchar *dst, uint dw, uint dh) {
@@ -876,7 +876,7 @@ static bool texturedata(ImageData &d, const char *tname, Slot::Tex *tex = NULL, 
 		} else {
 			file = tex->name;
 		}
-        static string pname;
+        static safe_string pname;
         formatstring(pname)("packages/%s", file);
         file = path(pname);
     } else 
@@ -929,7 +929,7 @@ static bool texturedata(ImageData &d, const char *tname, Slot::Tex *tex = NULL, 
     int flen = strlen(file);
     if(flen >= 4 && (!strcasecmp(file + flen - 4, ".dds") || dds))
     {
-        string dfile;
+        safe_string dfile;
         copystring(dfile, file);
         memcpy(dfile + flen - 4, ".dds", 4);
         if(!raw && hasTC && loaddds(dfile, d)) return true;
@@ -1000,7 +1000,7 @@ static bool texturepvrt(char *&fbuf, const char *tname, Slot::Tex *tex, bool msg
 		} else {
 			file = tex->name;
 		}
-        static string pname;
+        static safe_string pname;
         formatstring(pname)("packages/%s", file);
         file = path(pname);
     } else 
@@ -1051,7 +1051,7 @@ static bool texturepvrt(char *&fbuf, const char *tname, Slot::Tex *tex, bool msg
 		renderprogress(loadprogress, file);
 	}
 	char tm[256] = { 0, }, fn[256] = { 0, };
-	std::string Tmp = GetBaseAppPath() + file;
+	std::safe_string Tmp = GetBaseAppPath() + file;
 	strncpy( tm, Tmp.c_str(), strlen((char*)Tmp.c_str()) - 4);
 	sprintf( fn,  "%s.pvr", tm );
 	FILE *f = fopen(fn, "rb");
@@ -1162,7 +1162,7 @@ void loadalphamask(Texture *t) {
 }
 
 Texture *textureload(const char *name, int clamp, bool mipit, bool msg) {
-    string tname;
+    safe_string tname;
     copystring(tname, name);
     Texture *t = textures.access(path(tname));
 	if(t) {
@@ -2146,7 +2146,7 @@ Texture *cubemaploadwildcard(Texture *t, const char *name, bool mipit, bool msg,
 	if(!hasCM) {
 		return NULL;
 	}
-    string tname;
+    safe_string tname;
     if(!name) copystring(tname, t->name);
     else
     {
@@ -2160,7 +2160,7 @@ Texture *cubemaploadwildcard(Texture *t, const char *name, bool mipit, bool msg,
     }
     char *wildcard = strchr(tname, '*');
     ImageData surface[6];
-    string sname;
+    safe_string sname;
     if(!wildcard) copystring(sname, tname);
     GLenum format = GL_FALSE;
     int tsize = 0, compress = 0;
@@ -2238,7 +2238,7 @@ Texture *cubemaploadwildcard(Texture *t, const char *name, bool mipit, bool msg,
 Texture *cubemapload(const char *name, bool mipit, bool msg, bool transient) {
 #ifdef SUPPORTCUBEMAP
     if(!hasCM) return NULL;
-    string pname;
+    safe_string pname;
     copystring(pname, makerelpath("packages", name));
     path(pname);
     Texture *t = NULL;
@@ -2620,7 +2620,7 @@ void gendds(char *infile, char *outfile) {
             return;
     }
     if(!outfile[0]) {
-        static string buf;
+        static safe_string buf;
         copystring(buf, infile);
         int len = strlen(buf);
         if(len > 4 && buf[len-4]=='.') memcpy(&buf[len-4], ".dds", 4);
@@ -2892,7 +2892,7 @@ SVARP(screenshotdir, "");
 
 void screenshot(char *filename)
 {
-    static string buf;
+    static safe_string buf;
     int format = -1;
     copystring(buf, screenshotdir);
     if(screenshotdir[0])
@@ -2969,7 +2969,7 @@ SDL_Surface *loadsurface(const char *name) {
 #ifdef WIN32
     if(!s) s = IMG_Load(findfile(name, "rb"));
 #else
-	std::string Tmp = GetBaseAppPath() + name;
+	std::safe_string Tmp = GetBaseAppPath() + name;
 	if(!s) s = IMG_Load(Tmp.c_str());
 #endif
     return fixsurfaceformat(s);

@@ -212,7 +212,6 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				AdditionalManifestFiles="dpiaware.manifest"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"

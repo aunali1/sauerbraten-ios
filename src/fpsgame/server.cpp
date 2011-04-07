@@ -169,7 +169,7 @@ namespace server
     struct savedscore
     {
         uint ip;
-        string name;
+        safe_string name;
         int maxhealth, frags, flags, deaths, teamkills, shotdamage, damage;
         int timeplayed;
         float effectiveness;
@@ -207,7 +207,7 @@ namespace server
     struct clientinfo
     {
         int clientnum, ownernum, connectmillis, sessionid, overflow;
-        string name, team, mapvote;
+        safe_string name, team, mapvote;
         int playermodel;
         int modevote;
         int privilege;
@@ -219,9 +219,9 @@ namespace server
         int posoff, poslen, msgoff, msglen;
         vector<clientinfo *> bots;
         uint authreq;
-        string authname;
+        safe_string authname;
         int ping, aireinit;
-        string clientmap;
+        safe_string clientmap;
         int mapcrc;
         bool warned, gameclip;
         ENetPacket *clipboard;
@@ -371,7 +371,7 @@ namespace server
     int gamemillis = 0, gamelimit = 0, nextexceeded = 0;
     bool gamepaused = false;
 
-    string smapname = "";
+    safe_string smapname = "";
     int interm = 0;
     bool mapreload = false;
     enet_uint32 lastsend = 0;
@@ -387,7 +387,7 @@ namespace server
 
     struct demofile
     {
-        string info;
+        safe_string info;
         uchar *data;
         int len;
     };
@@ -506,7 +506,7 @@ namespace server
     {
         if(!name) name = ci->name;
         if(name[0] && !duplicatename(ci, name) && ci->state.aitype == AI_NONE) return name;
-        static string cname[3];
+        static safe_string cname[3];
         static int cidx = 0;
         cidx = (cidx+1)%3;
         formatstring(cname[cidx])(ci->state.aitype == AI_NONE ? "%s \fs\f5(%d)\fr" : "%s \fs\f5[%d]\fr", name, ci->clientnum);
@@ -813,7 +813,7 @@ namespace server
     {
         if(demoplayback) return;
         demoheader hdr;
-        string msg;
+        safe_string msg;
         msg[0] = '\0';
         defformatstring(file)("%s.dmo", smapname);
         demoplayback = opengzfile(file, "rb");
@@ -895,7 +895,7 @@ namespace server
 
     void hashpassword(int cn, int sessionid, const char *pwd, char *result, int maxlen)
     {
-        char buf[2*sizeof(string)];
+        char buf[2*sizeof(safe_string)];
         formatstring(buf)("%d %d ", cn, sessionid);
         copystring(&buf[strlen(buf)], pwd);
         if(!hashstring(buf, result, maxlen)) *result = '\0';
@@ -903,7 +903,7 @@ namespace server
 
     bool checkpassword(clientinfo *ci, const char *wanted, const char *given)
     {
-        string hash;
+        safe_string hash;
         hashpassword(ci->clientnum, ci->sessionid, wanted, hash, sizeof(hash));
         return !strcmp(hash, given);
     }
@@ -956,7 +956,7 @@ namespace server
         }
         mastermode = MM_OPEN;
         allowedips.shrink(0);
-        string msg;
+        safe_string msg;
         if(val && authname) formatstring(msg)("%s claimed %s as '\fs\f5%s\fr'", colorname(ci), name, authname);
         else formatstring(msg)("%s %s %s", colorname(ci), val ? "claimed" : "relinquished", name);
         sendservmsg(msg);
@@ -1803,7 +1803,7 @@ namespace server
         }
         if(total - unsent < min(total, 4)) return;
         crcs.sort(crcinfo::compare);
-        string msg;
+        safe_string msg;
         loopv(clients)
         {
             clientinfo *ci = clients[i];
@@ -2015,7 +2015,7 @@ namespace server
     void processmasterinput(const char *cmd, int cmdlen, const char *args)
     {
         uint id;
-        string val;
+        safe_string val;
         if(sscanf(cmd, "failauth %u", &id) == 1)
             authfailed(id);
         else if(sscanf(cmd, "succauth %u", &id) == 1)
@@ -2703,7 +2703,7 @@ namespace server
 
             case N_AUTHTRY:
             {
-                string desc, name;
+                safe_string desc, name;
                 getstring(desc, p, sizeof(desc)); // unused for now
                 getstring(name, p, sizeof(name));
                 if(!desc[0]) tryauth(ci, name);
@@ -2712,7 +2712,7 @@ namespace server
 
             case N_AUTHANS:
             {
-                string desc, ans;
+                safe_string desc, ans;
                 getstring(desc, p, sizeof(desc)); // unused for now
                 uint id = (uint)getint(p);
                 getstring(ans, p, sizeof(ans));

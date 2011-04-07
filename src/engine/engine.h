@@ -108,8 +108,8 @@ struct font {
     int offsetx, offsety, offsetw, offseth;
 };
 
-#define FONTH (curfont->defaulth)
-#define FONTW (curfont->defaultw)
+#define FONTH (curfont->defaulth * 2)
+#define FONTW (curfont->defaultw * 2)
 #define MINRESW 480
 #define MINRESH 320
 
@@ -431,7 +431,7 @@ extern bool pointinsel(selinfo &sel, vec &o);
 extern void resetmap();
 extern void startmap(const char *name);
 // rendermodel
-struct mapmodelinfo { string name; model *m; };
+struct mapmodelinfo { safe_string name; model *m; };
 extern void findanims(const char *pattern, vector<int> &anims);
 extern void loadskin(const char *dir, const char *altdir, Texture *&skin, Texture *&masks);
 extern mapmodelinfo &getmminfo(int i);
@@ -473,6 +473,7 @@ extern void g3d_render();
 extern bool g3d_windowhit(bool on, bool act);
 // menus
 extern int mainmenu;
+extern int showmenu;
 extern void clearmainmenu();
 extern void g3d_mainmenu();
 // sound

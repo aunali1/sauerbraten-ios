@@ -522,7 +522,7 @@ struct Slot {
     struct Tex {
         int type;
         Texture *t;
-        string name;
+        safe_string name;
         int combined;
     };
 

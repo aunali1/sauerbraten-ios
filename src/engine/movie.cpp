@@ -29,7 +29,7 @@ struct aviwriter
     uint videoframes;
     uint filesequence;    
     const uint videow, videoh, videofps;
-    string filename;
+    safe_string filename;
     uint physvideoframes;
     uint physsoundbytes;
     
@@ -174,7 +174,7 @@ struct aviwriter
     bool open()
     {
         close();
-        string seqfilename;
+        safe_string seqfilename;
         if(filesequence == 0) copystring(seqfilename, filename);
         else
         {
@@ -182,7 +182,7 @@ struct aviwriter
             char *ext = strrchr(filename, '.');
             if(filesequence == 1) 
             {
-                string oldfilename;
+                safe_string oldfilename;
                 copystring(oldfilename, findfile(filename, "wb"));
                 *ext = '\0';
                 conoutf("movie now recording to multiple: %s_XXX.%s files", filename, ext+1);

@@ -539,7 +539,7 @@ char *conc(char **w, int n, bool space)
     char *r = newstring("", len);
     loopi(n)
     {
-        strcat(r, w[i]);  // make string-list out of all arguments
+        strcat(r, w[i]);  // make safe_string-list out of all arguments
         if(i==n-1) break;
         if(space) strcat(r, " ");
     }
@@ -571,7 +571,7 @@ char *executeret(const char *p)               // all evaluation happens here, re
         }
 
         p += strcspn(p, ";\n\0");
-        cont = *p++!=0;                         // more statements if this isn't the end of the string
+        cont = *p++!=0;                         // more statements if this isn't the end of the safe_string
         char *c = w[0];
         if(!c || !*c) continue;                       // empty statement
 
@@ -714,7 +714,7 @@ int execute(const char *p)
 
 bool execfile(const char *cfgfile, bool msg)
 {
-    string s;
+    safe_string s;
     copystring(s, cfgfile);
     char *buf = loadfile(path(s), NULL);
     if(!buf)
@@ -790,7 +790,7 @@ COMMAND(writecfg, "s");
 // below the commands that implement a small imperative language. thanks to the semantics of
 // () and [] expressions, any control construct can be defined trivially.
 
-static string retbuf[3];
+static safe_string retbuf[3];
 static int retidx = 0;
 
 const char *intstr(int v)

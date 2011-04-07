@@ -100,12 +100,30 @@ static inline T min(T a, T b)
 
 // easy safe strings
 
-#define MAXSTRLEN 260
-typedef char string[MAXSTRLEN];
+#define MAXSTRLEN 512
+typedef char safe_string[MAXSTRLEN];
 
-inline void vformatstring(char *d, const char *fmt, va_list v, int len = MAXSTRLEN) { _vsnprintf(d, len, fmt, v); d[len-1] = 0; }
-inline char *copystring(char *d, const char *s, size_t len = MAXSTRLEN) { strncpy(d, s, len); d[len-1] = 0; return d; }
-inline char *concatstring(char *d, const char *s, size_t len = MAXSTRLEN) { size_t used = strlen(d); return used < len ? copystring(d+used, s, len-used) : d; }
+inline void vformatstring(char *d, const char *fmt, va_list v, int len = MAXSTRLEN) { 
+	_vsnprintf(d, len, fmt, v); 
+	d[len-1] = 0; 
+}
+
+inline char *copystring(char *d, const char *s, size_t len = MAXSTRLEN) { 
+	strncpy(d, s, len); 
+	d[len-1] = 0; 
+	return d; 
+}
+
+inline char *ccopystring(char *d, const char *s, size_t len = MAXSTRLEN) { 
+	strncpy(d, s, len); 
+	d[len-1] = 0; 
+	return d; 
+}
+
+inline char *concatstring(char *d, const char *s, size_t len = MAXSTRLEN) { 
+	size_t used = strlen(d); 
+	return used < len ? copystring(d+used, s, len-used) : d; 
+}
 
 struct stringformatter
 {
@@ -121,8 +139,8 @@ struct stringformatter
 };
 
 #define formatstring(d) stringformatter((char *)d)
-#define defformatstring(d) string d; formatstring(d)
-#define defvformatstring(d,last,fmt) string d; { va_list ap; va_start(ap, last); vformatstring(d, fmt, ap); va_end(ap); }
+#define defformatstring(d) safe_string d; formatstring(d)
+#define defvformatstring(d,last,fmt) safe_string d; { va_list ap; va_start(ap, last); vformatstring(d, fmt, ap); va_end(ap); }
 
 #define loopv(v)    for(int i = 0; i<(v).length(); i++)
 #define loopvj(v)   for(int j = 0; j<(v).length(); j++)

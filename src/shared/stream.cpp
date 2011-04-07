@@ -10,12 +10,12 @@
 #include "macutils.h"
 #endif
 
-string homedir = "";
+safe_string homedir = "";
 vector<char *> packagedirs;
 
 char *makerelpath(const char *dir, const char *file, const char *prefix, const char *cmd)
 {
-    static string tmp;
+    static safe_string tmp;
     if(prefix) copystring(tmp, prefix);
     else tmp[0] = '\0';
     if(file[0]=='<')
@@ -78,7 +78,7 @@ char *path(char *s)
     }
     return s;
 //#else
-//	string tmp;
+//	safe_string tmp;
 //	copystring(tmp,s);
 //	return concatstring(GetBaseAppPath(), tmp);
 //#endif
@@ -86,7 +86,7 @@ char *path(char *s)
 
 char *path(const char *s, bool copy)
 {
-    static string tmp;
+    static safe_string tmp;
     copystring(tmp, s);
     path(tmp);
     return tmp;
@@ -96,7 +96,7 @@ const char *parentdir(const char *directory)
 {
     const char *p = directory + strlen(directory);
     while(p > directory && *p != '/' && *p != '\\') p--;
-    static string parent;
+    static safe_string parent;
     size_t len = p-directory+1;
     copystring(parent, directory, len);
     return parent;
@@ -119,7 +119,7 @@ bool createdir(const char *path)
     size_t len = strlen(path);
     if(path[len-1]==PATHDIV)
     {
-        static string strip;
+        static safe_string strip;
         path = copystring(strip, path, len);
     }
 #ifdef WIN32
@@ -143,28 +143,28 @@ size_t fixpackagedir(char *dir)
 
 void sethomedir(const char *dir)
 {
-    string pdir;
+    safe_string pdir;
     copystring(pdir, dir);
     if(fixpackagedir(pdir) > 0) copystring(homedir, pdir);
 }
 
 void addpackagedir(const char *dir)
 {
-    string pdir;
+    safe_string pdir;
     copystring(pdir, dir);
     if(fixpackagedir(pdir) > 0) packagedirs.add(newstring(pdir));
 }
 
 const char *findfile(const char *filename, const char *mode)
 {
-    static string s;
+    static safe_string s;
     if(homedir[0])
     {
         formatstring(s)("%s%s", homedir, filename);
         if(fileexists(s, mode)) return s;
         if(mode[0]=='w' || mode[0]=='a')
         {
-            string dirs;
+            safe_string dirs;
             copystring(dirs, s);
             char *dir = strchr(dirs[0]==PATHDIV ? dirs+1 : dirs, PATHDIV);
             while(dir)
@@ -201,7 +201,7 @@ bool listdir(const char *dir, const char *ext, vector<char *> &files)
         return true;
     }
     #else
-    string pathname;
+    safe_string pathname;
     copystring(pathname, dir);
     DIR *d = opendir(path(pathname));
     if(d)
@@ -228,7 +228,7 @@ int listfiles(const char *dir, const char *ext, vector<char *> &files)
 {
     int dirs = 0;
     if(listdir(dir, ext, files)) dirs++;
-    string s;
+    safe_string s;
     if(homedir[0])
     {
         formatstring(s)("%s%s", homedir, dir);

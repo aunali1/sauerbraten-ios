@@ -2,7 +2,7 @@ struct obj;
 
 obj *loadingobj = 0;
 
-string objdir;
+safe_string objdir;
 
 struct obj : vertmodel
 {
@@ -78,7 +78,7 @@ struct obj : vertmodel
                 } \
             } while(0)
 
-            string meshname = "";
+            safe_string meshname = "";
             vertmesh *curmesh = NULL;
             while(file->getline(buf, sizeof(buf)))
             {

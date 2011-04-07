@@ -261,7 +261,7 @@ static void linkglslprogram(Shader &s, bool msg = true)
         loopv(s.defaultparams)
         {
             ShaderParam &param = s.defaultparams[i];
-            string pname;
+            safe_string pname;
             if(param.type==SHPARAM_UNIFORM) copystring(pname, param.name);
             else formatstring(pname)("%s%d", param.type==SHPARAM_VERTEX ? "v" : "p", param.index);
             param.loc = glGetUniformLocation_(s.program, pname);
@@ -423,7 +423,7 @@ static void allocglslactiveuniforms(Shader &s)
 #ifdef WIN32	
     GLint numactive = 0;
     glGetObjectParameteriv_(s.program, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &numactive);
-    string name;
+    safe_string name;
     loopi(numactive)
     {
         GLsizei namelen = 0;
@@ -849,7 +849,7 @@ void Shader::cleanup(bool invalid)
 static void genattriblocs(Shader &s, const char *vs, const char *ps)
 {
     static int len = strlen("#pragma CUBE2_attrib");
-    string name;
+    safe_string name;
     int loc;
     while((vs = strstr(vs, "#pragma CUBE2_attrib")))
     {
@@ -862,7 +862,7 @@ static void genattriblocs(Shader &s, const char *vs, const char *ps)
 static void genuniformlocs(Shader &s, const char *vs, const char *ps)
 {
     static int len = strlen("#pragma CUBE2_uniform");
-    string name, blockname;
+    safe_string name, blockname;
     int binding, stride;
     while((vs = strstr(vs, "#pragma CUBE2_uniform")))
     {
@@ -1174,7 +1174,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
     }
 
     const char *vspragma = strstr(vs, "#pragma CUBE2_dynlight"), *pspragma = strstr(ps, "#pragma CUBE2_dynlight");
-    string pslight;
+    safe_string pslight;
     vspragma += strcspn(vspragma, "\n");
     if(*vspragma) vspragma++;
     
@@ -1228,7 +1228,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
         loopk(i+1)
         {
             extern int ati_dph_bug;
-            string tc, dl;
+            safe_string tc, dl;
             if(s.type & SHADER_GLSLANG) formatstring(tc)(
                 k<numlights ? 
                     "dynlight%ddir = gl_Vertex.xyz*dynlight%dpos.w + dynlight%dpos.xyz;\n" :
@@ -1305,7 +1305,7 @@ static void genshadowmapvariant(Shader &s, const char *sname, const char *vs, co
     }
 
     const char *vspragma = strstr(vs, "#pragma CUBE2_shadowmap"), *pspragma = strstr(ps, "#pragma CUBE2_shadowmap");
-    string pslight;
+    safe_string pslight;
     vspragma += strcspn(vspragma, "\n");
     if(*vspragma) vspragma++;
 

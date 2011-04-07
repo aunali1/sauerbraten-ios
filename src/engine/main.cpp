@@ -125,9 +125,9 @@ static void getbackgroundres(int &w, int &h) {
     h = int(ceil(h*hk));
 }
 
-string backgroundcaption = "";
+safe_string backgroundcaption = "";
 Texture *backgroundmapshot = NULL;
-string backgroundmapname = "";
+safe_string backgroundmapname = "";
 char *backgroundmapinfo = NULL;
 
 void restorebackground() {
@@ -996,6 +996,16 @@ void checkinput() {
 				}
                 keypress(-event.button.button, event.button.state!=0, 0, mouseID);
 #ifdef SUPPORTONSCREENBUTTON
+				float cx, cy;
+				g3d_cursorpos(cx, cy);
+				cx = cx * SCREENW;
+				cy = cy * SCREENH;
+				if (cx > ESCAPEX - TOUCHSIZE2 && 
+					cx < ESCAPEX + TOUCHSIZE2 && 
+					cy > ESCAPEY - TOUCHSIZE2 && 
+					cy < ESCAPEY + TOUCHSIZE2) {
+					keypress(27, true, 0, 0);
+				}
 				/*if (lastx == -1) {
 					lastx = event.motion.x;
 					lasty = event.motion.y;
@@ -1049,13 +1059,13 @@ void stackdumper(unsigned int type, EXCEPTION_POINTERS *ep) {
     if(!ep) fatal("unknown type");
     EXCEPTION_RECORD *er = ep->ExceptionRecord;
     CONTEXT *context = ep->ContextRecord;
-    string out, t;
+    safe_string out, t;
     formatstring(out)("Cube 2: Sauerbraten Win32 Exception: 0x%x [0x%x]\n\n", er->ExceptionCode, er->ExceptionCode==EXCEPTION_ACCESS_VIOLATION ? er->ExceptionInformation[1] : -1);
     STACKFRAME sf = {{context->Eip, 0, AddrModeFlat}, {}, {context->Ebp, 0, AddrModeFlat}, {context->Esp, 0, AddrModeFlat}, 0};
     SymInitialize(GetCurrentProcess(), NULL, TRUE);
     while(::StackWalk(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(), GetCurrentThread(), &sf, context, NULL, ::SymFunctionTableAccess, ::SymGetModuleBase, NULL))
     {
-        struct { IMAGEHLP_SYMBOL sym; string n; } si = { { sizeof( IMAGEHLP_SYMBOL ), 0, 0, 0, sizeof(string) } };
+        struct { IMAGEHLP_SYMBOL sym; safe_string n; } si = { { sizeof( IMAGEHLP_SYMBOL ), 0, 0, 0, sizeof(safe_string) } };
         IMAGEHLP_LINE li = { sizeof( IMAGEHLP_LINE ) };
         DWORD off;
         if(SymGetSymFromAddr(GetCurrentProcess(), (DWORD)sf.AddrPC.Offset, &off, &si.sym) && SymGetLineFromAddr(GetCurrentProcess(), (DWORD)sf.AddrPC.Offset, &off, &li))
@@ -1276,7 +1286,7 @@ int SDL_main(int argc, char **argv) {
 
     persistidents = false;
 
-    string gamecfgname;
+    safe_string gamecfgname;
     copystring(gamecfgname, "data/game_");
     concatstring(gamecfgname, game::gameident());
     concatstring(gamecfgname, ".cfg");

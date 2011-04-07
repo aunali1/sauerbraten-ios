@@ -2,7 +2,7 @@ struct md5;
 
 md5 *loadingmd5 = NULL;
 
-string md5dir;
+safe_string md5dir;
 
 struct md5joint
 {
@@ -25,7 +25,7 @@ struct md5vert
 
 struct md5hierarchy
 {
-    string name;
+    safe_string name;
     int parent, flags, start;
 };
 
@@ -194,7 +194,7 @@ struct md5 : skelmodel
                 }
                 else if(strstr(buf, "joints {"))
                 {
-                    string name;
+                    safe_string name;
                     int parent;
                     md5joint j;
                     while(f->getline(buf, sizeof(buf)) && buf[0]!='}')

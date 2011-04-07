@@ -955,7 +955,7 @@ void renderparticles(bool mainpass)
         {
             int type = parts[i]->type;
             const char *title = parts[i]->texname ? strrchr(parts[i]->texname, '/')+1 : NULL;
-            string info = "";
+            safe_string info = "";
             if(type&PT_GLARE) concatstring(info, "g,");
             if(type&PT_LERP) concatstring(info, "l,");
             if(type&PT_MOD) concatstring(info, "m,");
