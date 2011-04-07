@@ -2,7 +2,7 @@ struct md3;
 
 md3 *loadingmd3 = NULL;
 
-string md3dir;
+safe_string md3dir;
 
 struct md3frame
 {

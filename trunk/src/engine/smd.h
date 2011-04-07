@@ -2,11 +2,11 @@ struct smd;
 
 smd *loadingsmd = NULL;
 
-string smddir;
+safe_string smddir;
 
 struct smdbone
 {
-    string name;
+    safe_string name;
     int parent;
     smdbone() : parent(-1) { name[0] = '\0'; }
 };
@@ -89,7 +89,7 @@ struct smd : skelmodel
                 if(skipcomment(curbuf)) continue;
                 if(!strncmp(curbuf, "end", 3)) break;
                 int id = strtol(curbuf, &curbuf, 10);
-                string name;
+                safe_string name;
                 readname(curbuf, name, sizeof(name));
                 int parent = strtol(curbuf, &curbuf, 10);
                 if(id < 0 || id > 255 || parent > 255 || !name[0]) continue; 
@@ -165,7 +165,7 @@ struct smd : skelmodel
                 char *curbuf = buf;
                 if(skipcomment(curbuf)) continue;
                 if(!strncmp(curbuf, "end", 3)) break;
-                string material;
+                safe_string material;
                 readmaterial(curbuf, material, sizeof(material)); 
                 if(!curmesh || strcmp(curmesh->mesh->name, material))
                 {

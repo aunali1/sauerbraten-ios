@@ -779,6 +779,9 @@ void addgrasstri(int face, vertex *verts, int numv, ushort texture, ushort lmid)
 static inline void calctexgen(VSlot &vslot, int dim, vec4 &sgen, vec4 &tgen)
 {
     Texture *tex = vslot.slot->sts.empty() ? notexture : vslot.slot->sts[0].t;
+	if (tex == 0) {
+		tex = notexture;
+	}
     float k = TEX_SCALE/vslot.scale,
           xs = vslot.rotation>=2 && vslot.rotation<=4 ? -tex->xs : tex->xs,
           ys = (vslot.rotation>=1 && vslot.rotation<=2) || vslot.rotation==5 ? -tex->ys : tex->ys,

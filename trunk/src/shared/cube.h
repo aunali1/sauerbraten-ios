@@ -47,14 +47,18 @@
 
 #define SCREENW 480
 #define SCREENH 320
-#define TOUCHMOVEX 32
-#define TOUCHMOVEY 288
-#define TOUCHFIREX 448
-#define TOUCHFIREY 288
+#define ESCAPEX 32
+#define ESCAPEY 32
+#define TOUCHMOVEX 64
+#define TOUCHMOVEY 256
+#define TOUCHFIREX 416
+#define TOUCHFIREY 256
 #define TOUCHSWAPX 448
 #define TOUCHSWAPY 32
-#define TOUCHSIZE 32
+#define TOUCHSIZE 64
 #define TOUCHRANGE 32
+#define TOUCHSIZE2 32
+#define TOUCHRANGE2 16
 
 #define SUPPORTONSCREENBUTTON
 //#define SUPPORTSOUND
@@ -84,7 +88,7 @@
 #include <OpenGLES/es1/gl.h>
 #include <OpenGLES/es1/glext.h>
 #endif
-
+#if WEBOS | __IPHONEOS__
 #define glGenBuffers_ glGenBuffers
 #define glBindBuffer_ glBindBuffer
 #define glMapBuffer_ glMapBuffer
@@ -149,6 +153,7 @@
 #define GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT32_OES
 #define GL_RGB8 GL_RGB8_OES
 #define GL_RGBA8 GL_RGBA8_OES
+#endif
 #endif
 
 #include "enet.h"

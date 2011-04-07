@@ -200,7 +200,7 @@ int setdynlights(vtxarray *va)
 {
     if(closedynlights.empty() || !va->dynlightmask) return 0;
 
-    static string posparams[MAXDYNLIGHTS] = { "" }, colorparams[MAXDYNLIGHTS] = { "" }, offsetparams[MAXDYNLIGHTS] = { "" };
+    static safe_string posparams[MAXDYNLIGHTS] = { "" }, colorparams[MAXDYNLIGHTS] = { "" }, offsetparams[MAXDYNLIGHTS] = { "" };
     if(!*posparams[0]) loopi(MAXDYNLIGHTS)
     {
         formatstring(posparams[i])("dynlight%dpos", i);

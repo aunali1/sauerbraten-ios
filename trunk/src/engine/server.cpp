@@ -15,7 +15,7 @@ void fatal(const char *s, ...)
 
 void conoutfv(int type, const char *fmt, va_list args)
 {
-    string sf, sp;
+    safe_string sf, sp;
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
     puts(sp);
@@ -163,7 +163,7 @@ struct client                   // server side version of "dynent" type
     int type;
     int num;
     ENetPeer *peer;
-    string hostname;
+    safe_string hostname;
     void *info;
 };
 

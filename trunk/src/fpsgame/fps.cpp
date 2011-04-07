@@ -407,7 +407,7 @@ namespace game
         fpsent *h = followingplayer();
         if(!h) h = player1;
         int contype = d==h || actor==h ? CON_FRAG_SELF : CON_FRAG_OTHER;
-        string dname, aname;
+        safe_string dname, aname;
         copystring(dname, d==player1 ? "you" : colorname(d));
         copystring(aname, actor==player1 ? "you" : colorname(actor));
         if(actor->type==ENT_AI)
@@ -657,7 +657,7 @@ namespace game
     {
         if(!name) name = d->name;
         if(name[0] && !duplicatename(d, name) && d->aitype == AI_NONE) return name;
-        static string cname[3];
+        static safe_string cname[3];
         static int cidx = 0;
         cidx = (cidx+1)%3;
         formatstring(cname[cidx])(d->aitype == AI_NONE ? "%s%s \fs\f5(%d)\fr" : "%s%s \fs\f5[%d]\fr", prefix, name, d->clientnum);

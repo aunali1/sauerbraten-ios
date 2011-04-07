@@ -623,6 +623,7 @@ void menuprocess()
 }
 
 VAR(mainmenu, 1, 1, 0);
+VAR(showmenu, 1, 1, 0);
 
 void clearmainmenu()
 {

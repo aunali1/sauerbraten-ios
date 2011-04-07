@@ -1252,7 +1252,7 @@ namespace ai
         }, *btypes[AI_T_MAX+1] = {
             "none", "node", "player", "affinity", "entity"
         };
-        string s;
+        safe_string s;
         if(top)
         {
             formatstring(s)("\f0%s (%d) %s:%d (%d[%d])",

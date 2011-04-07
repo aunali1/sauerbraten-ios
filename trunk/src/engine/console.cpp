@@ -5,7 +5,7 @@
 struct cline { char *line; int type, outtime; };
 vector<cline> conlines;
 int commandmillis = -1;
-string commandbuf;
+safe_string commandbuf;
 char *commandaction = NULL, *commandprompt = NULL;
 int commandpos = -1;
 bool OnScreenTouch[11];
@@ -576,6 +576,8 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 			static int StartTouchX, StartTouchY, EndTouchX, EndTouchY;
 			static bool FireTouch = false;
 			static int FireTouchX, FireTouchY;
+			static bool EscapeTouch = false;
+			static int EscapeTouchX, EscapeTouchY;
 			OnScreenTouch[mouseID] = false;
 			if (!MovementTouch && isdown) {
 				if (cx > TOUCHMOVEX - TOUCHSIZE && 
@@ -591,10 +593,10 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 				MovementTouch = false;
 			}
 			if (!SwapTouch && isdown) {
-				if (cx > TOUCHSWAPX - TOUCHSIZE && 
-					cx < TOUCHSWAPX + TOUCHSIZE && 
-					cy > TOUCHSWAPY - TOUCHSIZE && 
-					cy < TOUCHSWAPY + TOUCHSIZE) {
+				if (cx > TOUCHSWAPX - TOUCHSIZE2 && 
+					cx < TOUCHSWAPX + TOUCHSIZE2 && 
+					cy > TOUCHSWAPY - TOUCHSIZE2 && 
+					cy < TOUCHSWAPY + TOUCHSIZE2) {
 					SwapTouch = true;
 					OnScreenTouch[mouseID] = true;
 				}
@@ -611,6 +613,17 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 				OnScreenTouch[mouseID] = true;
 			} else {
 				FireTouch = false;
+			}
+			if (cx > ESCAPEX - TOUCHSIZE2 && 
+				cx < ESCAPEX + TOUCHSIZE2 && 
+				cy > ESCAPEY - TOUCHSIZE2 && 
+				cy < ESCAPEY + TOUCHSIZE2) {
+				EscapeTouch = true;
+				EscapeTouchX = cx;
+				EscapeTouchY = cy;
+				OnScreenTouch[mouseID] = true;
+			} else {
+				EscapeTouch = false;
 			}
 			/*if (!FireTouch && isdown) {
 			} else {
@@ -653,6 +666,13 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 			}
 			if (FireTouch) {
 				keym *key = keyms.access(-1);
+				execbind(*key, isdown);
+			} else {
+				//keym *key = keyms.access(-1);
+				//execbind(*key, false);
+			}
+			if (EscapeTouch) {
+				keym *key = keyms.access(27);
 				execbind(*key, isdown);
 			} else {
 				//keym *key = keyms.access(-1);
@@ -761,7 +781,7 @@ static hashtable<fileskey, filesval *> completefiles;
 static hashtable<char *, filesval *> completions;
 
 int completesize = 0;
-string lastcomplete;
+safe_string lastcomplete;
 
 void resetcomplete() { completesize = 0; }
 
@@ -820,7 +840,7 @@ void complete(char *s)
 {
     if(*s!='/')
     {
-        string t;
+        safe_string t;
         copystring(t, s);
         copystring(s, "/");
         concatstring(s, t);
@@ -834,7 +854,7 @@ void complete(char *s)
         char *end = strchr(s, ' ');
         if(end)
         {
-            string command;
+            safe_string command;
             copystring(command, s+1, min(size_t(end-s), sizeof(command)));
             filesval **hasfiles = completions.access(command);
             if(hasfiles) f = *hasfiles;
@@ -842,7 +862,7 @@ void complete(char *s)
     }
 
     const char *nextcomplete = NULL;
-    string prefix;
+    safe_string prefix;
     copystring(prefix, "/");
     if(f) // complete using filenames
     {

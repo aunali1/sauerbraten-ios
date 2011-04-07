@@ -303,7 +303,7 @@ enum
 
     HICON_X       = 20,
     HICON_Y       = 1650,
-    HICON_TEXTY   = 1644,
+    HICON_TEXTY   = 1500,//1644,
     HICON_STEP    = 490,
     HICON_SIZE    = 120,
     HICON_SPACE   = 40
@@ -520,7 +520,7 @@ struct fpsent : dynent, fpsstate
     float deltayaw, deltapitch, newyaw, newpitch;
     int smoothmillis;
 
-    string name, team, info;
+    safe_string name, team, info;
     int playermodel;
     ai::aiinfo *ai;
     int ownernum, lastnode;
@@ -652,7 +652,7 @@ namespace game
 
     // fps
     extern int gamemode, nextmode;
-    extern string clientmap;
+    extern safe_string clientmap;
     extern bool intermission;
     extern int maptime, maprealtime, maplimit;
     extern fpsent *player1;
@@ -686,7 +686,7 @@ namespace game
 
     // client
     extern bool connected, remote, demoplayback;
-    extern string servinfo;
+    extern safe_string servinfo;
 
     extern int parseplayer(const char *arg);
     extern void addmsg(int type, const char *fmt = NULL, ...);

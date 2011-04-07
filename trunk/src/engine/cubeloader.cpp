@@ -261,7 +261,7 @@ struct cubeloader
     void load_cube_world(char *mname)
     {
         int loadingstart = SDL_GetTicks();
-        string pakname, cgzname;
+        safe_string pakname, cgzname;
         formatstring(pakname)("cube/%s", mname);
         formatstring(cgzname)("packages/%s.cgz", pakname);
         stream *f = opengzfile(path(cgzname), "rb");
@@ -366,7 +366,7 @@ struct cubeloader
         }
         delete f;
 
-        string cfgname;
+        safe_string cfgname;
         formatstring(cfgname)("packages/cube/%s.cfg", mname);
         overrideidents = true;
         execfile("packages/cube/package.cfg");

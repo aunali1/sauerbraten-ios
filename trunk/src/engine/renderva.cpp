@@ -1530,7 +1530,7 @@ static void changeslottmus(renderstate &cur, int pass, Slot &slot, VSlot &vslot)
 {
     if(pass==RENDERPASS_LIGHTMAP || pass==RENDERPASS_COLOR || pass==RENDERPASS_ENVMAP || pass==RENDERPASS_DYNLIGHT) 
     {
-        GLuint diffusetex = slot.sts.empty() ? notexture->id : slot.sts[0].t->id;
+        GLuint diffusetex = (slot.sts.empty() || slot.sts[0].t == 0) ? notexture->id : slot.sts[0].t->id;
         if(cur.textures[cur.diffusetmu]!=diffusetex)
             glBindTexture(GL_TEXTURE_2D, cur.textures[cur.diffusetmu] = diffusetex);
     }
@@ -1688,8 +1688,8 @@ static void changetexgen(renderstate &cur, int dim, Slot &slot, VSlot &vslot)
 {
     if(cur.texgenslot != &slot || cur.texgenvslot != &vslot)
     {
-        Texture *curtex = !cur.texgenslot || cur.texgenslot->sts.empty() ? notexture : cur.texgenslot->sts[0].t,
-                *tex = slot.sts.empty() ? notexture : slot.sts[0].t;
+        Texture *curtex = !cur.texgenslot || cur.texgenslot->sts.empty() || cur.texgenslot->sts[0].t == 0 ? notexture : cur.texgenslot->sts[0].t,
+                *tex = (slot.sts.empty() || slot.sts[0].t == 0) ? notexture : slot.sts[0].t;
         if(!cur.texgenvslot || slot.sts.empty() ||
             (curtex->xs != tex->xs || curtex->ys != tex->ys ||
              cur.texgenvslot->rotation != vslot.rotation || cur.texgenvslot->scale != vslot.scale ||

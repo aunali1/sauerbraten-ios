@@ -1321,7 +1321,7 @@ if you supply arguments when you execute an alias, and are popped when the alias
 </p>
 
 <p>
-There are two alternatives to "" for quoting a string: () and []. They work in
+There are two alternatives to "" for quoting a safe_string: () and []. They work in
 the same way as "", with the difference that they can be nested infinitely, and
 that they may contain linefeeds (useful for larger scripts). () is different
 from [] in that it evaluates the commands contained in it _before_ it evaluates
@@ -1378,26 +1378,26 @@ The AND and OR operators are implemented to shortcut.
 
 <pre id ="strstr">strstr S N</pre>
 <p>
-Searches the string S for the substring N and returns its starting position.
+Searches the safe_string S for the substring N and returns its starting position.
 This function is case sensitive, when N is not found it returns -1.
 (example: echo (strstr "for example this sentence" "this" ) - would return 14 ).
 </p>
 
 <pre id ="substr">substr S A B</pre>
 <p>
-Returns a part from the string S starting from A for B chars
+Returns a part from the safe_string S starting from A for B chars
 (example: echo (substr "grab this part here" 11 4 ) - would return "here" ).
 </p>
 
 <pre id ="strreplace">strreplace S A B</pre>
 <p>
-This searches the string S for substring A and replaces it with another substring B.
+This searches the safe_string S for substring A and replaces it with another substring B.
 (example: echo ( strreplace "this is serious" "serious" "fun" ) - would return "this is fun" ).
 </p>
 
 <pre id ="strlen">strlen S </pre>
 <p>
-Returns the length of the string S
+Returns the length of the safe_string S
 (example: echo (strlen "long sentence") - would return 13 ).
 </p>
 
@@ -1444,13 +1444,13 @@ Same as concat but without spaces between the elements.
 
 <pre id="format">format F V1..Vn</pre>
 <p>
-Substitutes the V values into the format string F and returns the result. The format strings %1 through %9 are substituted with V1 through V9, respectively, and may be
+Substitutes the V values into the format safe_string F and returns the result. The format strings %1 through %9 are substituted with V1 through V9, respectively, and may be
 used multiple times. %% will generate a single % character (example: format "%1 bottles of %2 on the %3, %1 bottles of %2!" 99 beer wall).
 </p>
 
 <pre id="at">at S N</pre>
 <p>
-Grabs the Nth word out of string S and returns the result
+Grabs the Nth word out of safe_string S and returns the result
 </p>
 
 <pre id="listlen">listlen L</pre>

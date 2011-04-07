@@ -4,13 +4,13 @@
 
 void backup(char *name, char *backupname)
 {
-    string backupfile;
+    safe_string backupfile;
     copystring(backupfile, findfile(backupname, "wb"));
     remove(backupfile);
     rename(findfile(name, "wb"), backupfile);
 }
 
-string ogzname, bakname, cfgname, picname;
+safe_string ogzname, bakname, cfgname, picname;
 
 VARP(savebak, 0, 2, 2);
 
@@ -23,7 +23,7 @@ void cutogz(char *s)
 void getmapfilenames(const char *fname, const char *cname, char *pakname, char *mapname, char *cfgname)
 {
     if(!cname) cname = fname;
-    string name;
+    safe_string name;
     copystring(name, cname, 100);
     cutogz(name);
     char *slash = strpbrk(name, "/\\");
@@ -44,7 +44,7 @@ void getmapfilenames(const char *fname, const char *cname, char *pakname, char *
 
 void setmapfilenames(const char *fname, const char *cname = 0)
 {
-    string pakname, mapname, mcfgname;
+    safe_string pakname, mapname, mcfgname;
     getmapfilenames(fname, cname, pakname, mapname, mcfgname);
 
     formatstring(ogzname)("packages/%s.ogz", mapname);
@@ -64,7 +64,7 @@ void mapcfgname()
     const char *mname = game::getclientmap();
     if(!*mname) mname = "untitled";
 
-    string pakname, mapname, mcfgname;
+    safe_string pakname, mapname, mcfgname;
     getmapfilenames(mname, NULL, pakname, mapname, mcfgname);
     defformatstring(cfgname)("packages/%s/%s.cfg", pakname, mcfgname);
     path(cfgname);
@@ -356,7 +356,7 @@ void loadvslot(stream *f, VSlot &vs, int changed)
     if(vs.changed & (1<<VSLOT_SHPARAM))
     {
         int numparams = f->getlil<ushort>();
-        string name;
+        safe_string name;
         loopi(numparams)
         {
             ShaderParam &p = vs.params.add();
@@ -628,7 +628,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     loopi(hdr.numvars)
     {
         int type = f->getchar(), ilen = f->getlil<ushort>();
-        string name;
+        safe_string name;
         f->read(name, min(ilen, MAXSTRLEN-1));
         name[min(ilen, MAXSTRLEN-1)] = '\0';
         if(ilen >= MAXSTRLEN) f->seek(ilen - (MAXSTRLEN-1), SEEK_CUR);
@@ -655,7 +655,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             case ID_SVAR:
             {
                 int slen = f->getlil<ushort>();
-                string val;
+                safe_string val;
                 f->read(val, min(slen, MAXSTRLEN-1));
                 val[min(slen, MAXSTRLEN-1)] = '\0';
                 if(slen >= MAXSTRLEN) f->seek(slen - (MAXSTRLEN-1), SEEK_CUR);
@@ -667,7 +667,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     }
     if(dbgvars) conoutf(CON_DEBUG, "read %d vars", hdr.numvars);
 
-    string gametype;
+    safe_string gametype;
     copystring(gametype, "fps");
     bool samegame = true;
     int eif = 0;

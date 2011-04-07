@@ -27,7 +27,7 @@ static float cursorx = 0.5f, cursory = 0.5f;
 #define ICON_SIZE (FONTH - SHADOW)
 #define SKIN_W 256
 #define SKIN_H 128
-#define SKIN_SCALE 4
+#define SKIN_SCALE 2
 #define INSERT (3 * SKIN_SCALE)
 
 VARP(guiautotab, 6, 16, 40);
@@ -95,7 +95,7 @@ struct gui : g3d_gui {
         if(color) tcolor = color;
         tpos++; 
         if(!name) {
-            static string title;
+            static safe_string title;
             formatstring(title)("%d", tpos);
             name = title;
         }
@@ -105,10 +105,10 @@ struct gui : g3d_gui {
             ysize = 0;
         } else {	
             cury = -ysize;
-            int h = FONTH-2*INSERT,
+            int h = FONTH - 2 * INSERT,
                 x1 = curx + tx,
-                x2 = x1 + w + ((skinx[3]-skinx[2]) + (skinx[5]-skinx[4]))*SKIN_SCALE,
-                y1 = cury - ((skiny[6]-skiny[1])-(skiny[3]-skiny[2]))*SKIN_SCALE-h,
+                x2 = x1 + w + ((skinx[3]-skinx[2]) + (skinx[5]-skinx[4])) * SKIN_SCALE,
+                y1 = cury - ((skiny[6]-skiny[1])-(skiny[3]-skiny[2])) * SKIN_SCALE - h,
                 y2 = cury;
             bool hit = tcurrent && windowhit==this && hitx>=x1 && hity>=y1 && hitx<x2 && hity<y2;
 			if(hit && (!guiclicktab || mousebuttons&G3D_DOWN)) {
@@ -278,7 +278,7 @@ struct gui : g3d_gui {
         {
             if(!label)
             {
-                static string s;
+                static safe_string s;
                 formatstring(s)("%d", val);
                 label = s;
             }
@@ -1339,9 +1339,10 @@ void g3d_render()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-
+	showmenu = 0;
     if(guis3d.length())
     {
+		showmenu = 1;
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_ALWAYS);
         glDepthMask(GL_FALSE);
@@ -1355,6 +1356,7 @@ void g3d_render()
 
     if(guis2d.length())
     {
+		showmenu = 1;
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();

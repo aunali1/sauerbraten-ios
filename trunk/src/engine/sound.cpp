@@ -437,7 +437,7 @@ int playsound(int n, const vec *loc, extentity *ent, int loops, int fade, int ch
         if(!slot.sample->name[0]) return -1;
 
         const char *exts[] = { "", ".wav", ".ogg" };
-        string buf;
+        safe_string buf;
         loopi(sizeof(exts)/sizeof(exts[0]))
         {
             formatstring(buf)("packages/sounds/%s%s", slot.sample->name, exts[i]);

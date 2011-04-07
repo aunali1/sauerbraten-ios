@@ -2057,6 +2057,19 @@ static Texture *crosshairs[MAXCROSSHAIRS] = { NULL, NULL, NULL, NULL };
 			glDisableClientState(GL_VERTEX_ARRAY);\
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+#define BUFFERRENDER2 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); \
+			glDisableClientState(GL_NORMAL_ARRAY);\
+			glDisableClientState(GL_COLOR_ARRAY);\
+			glEnableClientState(GL_VERTEX_ARRAY);\
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);\
+			glVertexPointer(2, GL_FLOAT, 0, verts);\
+			glTexCoordPointer(2, GL_FLOAT, 0, texcoords);\
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);\
+			glDisableClientState(GL_NORMAL_ARRAY);\
+			glDisableClientState(GL_COLOR_ARRAY);\
+			glDisableClientState(GL_VERTEX_ARRAY);\
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 
 void loadcrosshair(const char *name, int i)
 {
@@ -2097,10 +2110,11 @@ void writecrosshairs(stream *f)
 }
 
 void drawcrosshair(int w, int h, bool Cursor) {
+	bool windowhit = g3d_windowhit(true, false) || Cursor;
 	{
-		bool windowhit = g3d_windowhit(true, false) || Cursor;
 		if(!windowhit && (hidehud || mainmenu)) return; 
 		float r = 1, g = 1, b = 1, cx = 0.5f, cy = 0.5f, chsize;
+#ifdef WIN32
 		Texture *crosshair;
 		if(windowhit) {
 			static Texture *cursor = NULL;
@@ -2124,11 +2138,6 @@ void drawcrosshair(int w, int h, bool Cursor) {
 			}
 			chsize = crosshairsize * w / SCREENW;
 		}
-		/*if(crosshair->bpp==4) {
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		} else {
-			glBlendFunc(GL_ONE, GL_ONE);
-		}*/
 #ifdef WIN32	
 		glColor3f(r, g, b);
 #else
@@ -2140,7 +2149,8 @@ void drawcrosshair(int w, int h, bool Cursor) {
 		glEnable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glBindTexture(GL_TEXTURE_2D, crosshair->id);
-		glBlendFunc(GL_ONE, GL_ONE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef ORIGINAL
 		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0, 0); glVertex2f(x,          y);
@@ -2170,17 +2180,20 @@ void drawcrosshair(int w, int h, bool Cursor) {
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 #endif
+#endif
 	}
 #ifdef SUPPORTONSCREENBUTTON
-	{
+	{		
 		static Texture *Buttons = NULL;
+		static Texture *JoyPad = NULL;
 		if(!Buttons) {
 			Buttons = textureload("data/buttons.png", 1, false);
-		} else {
-			float chsize = TOUCHSIZE * 2;
+			JoyPad = textureload("data/joypad.png", 1, false);
+		} else {			
 			{
-				float x = TOUCHMOVEX - chsize / 2.0f;
-				float y = TOUCHMOVEY - chsize / 2.0f;
+				float chsize = TOUCHSIZE2 * 2;
+				float x = ESCAPEX - chsize / 2.0f;
+				float y = ESCAPEY - chsize / 2.0f;
 				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, Buttons->id);
 				GLfloat verts[] = {
@@ -2189,9 +2202,25 @@ void drawcrosshair(int w, int h, bool Cursor) {
 				GLfloat texcoords[] = {
 					0, 0, 1, 0, 0, 1, 1, 1
 				};
-				BUFFERRENDER;
+				BUFFERRENDER2;
+			}
+			if(showmenu || hidehud || mainmenu) return; 
+			{
+				float chsize = TOUCHSIZE * 2;
+				float x = TOUCHMOVEX - chsize / 2.0f;
+				float y = TOUCHMOVEY - chsize / 2.0f;
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, JoyPad->id);
+				GLfloat verts[] = {
+					x, y, x + chsize, y, x, y + chsize, x + chsize, y + chsize
+				};
+				GLfloat texcoords[] = {
+					0, 0, 1, 0, 0, 1, 1, 1
+				};
+				BUFFERRENDER2;
 			}
 			{
+				float chsize = TOUCHSIZE * 2;
 				float x = TOUCHFIREX - chsize / 2.0f;
 				float y = TOUCHFIREY - chsize / 2.0f;
 				glEnable(GL_TEXTURE_2D);
@@ -2202,9 +2231,10 @@ void drawcrosshair(int w, int h, bool Cursor) {
 				GLfloat texcoords[] = {
 					0, 0, 1, 0, 0, 1, 1, 1
 				};
-				BUFFERRENDER;
+				BUFFERRENDER2;
 			}
 			{
+				float chsize = TOUCHSIZE2 * 2;
 				float x = TOUCHSWAPX - chsize / 2.0f;
 				float y = TOUCHSWAPY - chsize / 2.0f;
 				glEnable(GL_TEXTURE_2D);
@@ -2215,7 +2245,7 @@ void drawcrosshair(int w, int h, bool Cursor) {
 				GLfloat texcoords[] = {
 					0, 0, 1, 0, 0, 1, 1, 1
 				};
-				BUFFERRENDER;
+				BUFFERRENDER2;
 			}
 		}
 	}
@@ -2309,8 +2339,8 @@ void gl_drawhud(int w, int h) {
                 int nextfps[3];
                 getfps(nextfps[0], nextfps[1], nextfps[2]);
                 loopi(3) if(prevfps[i]==curfps[i]) curfps[i] = nextfps[i];
-                if(showfpsrange) draw_textf("fps %d+%d-%d", conw-7*FONTH, conh-FONTH*3/2, curfps[0], curfps[1], curfps[2]);
-                else draw_textf("fps %d", conw-5*FONTH, conh-FONTH*3/2, curfps[0]);
+                if(showfpsrange) draw_textf("fps %d+%d-%d", SCREENW / 2 -7*FONTH, 32, curfps[0], curfps[1], curfps[2]);
+                else draw_textf("fps %d", conw-5*FONTH, 32, curfps[0]);
                 roffset += FONTH;
             }
 
@@ -2319,7 +2349,7 @@ void gl_drawhud(int w, int h) {
                 if(!walltime) { walltime = time(NULL); walltime -= totalmillis/1000; if(!walltime) walltime++; }
                 time_t walloffset = walltime + totalmillis/1000;
                 struct tm *localvals = localtime(&walloffset);
-                static string buf;
+                static safe_string buf;
                 if(localvals && strftime(buf, sizeof(buf), wallclocksecs ? (wallclock24 ? "%H:%M:%S" : "%I:%M:%S%p") : (wallclock24 ? "%H:%M" : "%I:%M%p"), localvals))
                 {
                     // hack because not all platforms (windows) support %P lowercase option
@@ -2401,13 +2431,13 @@ void gl_drawhud(int w, int h) {
     abovehud -= rendercommand(FONTH/2, abovehud - FONTH/2, conw-FONTH);
     extern int fullconsole;
     if(!hidehud || fullconsole) {
-		renderconsole(conw, conh, abovehud - FONTH/2);
+		//renderconsole(conw, conh, abovehud - FONTH/2);
 	}
     glPopMatrix();
 	//glDisable(GL_DEPTH_TEST);
     drawcrosshair(w, h, false);
 #ifdef SUPPORTONSCREENBUTTON
-	drawcrosshair(w, h, true);
+	//drawcrosshair(w, h, true);
 #endif
 	//glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);

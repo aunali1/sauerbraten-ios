@@ -262,7 +262,7 @@ enum { UNRESOLVED = 0, RESOLVING, RESOLVED };
 
 struct serverinfo
 {
-    string name, map, sdesc;
+    safe_string name, map, sdesc;
     int port, numplayers, ping, resolved, lastping;
     vector<int> attr;
     ENetAddress address;
@@ -524,7 +524,7 @@ char *showservers(g3d_gui *cgui)
         start = end;
     }
     if(!sc) return NULL;
-    string command;
+    safe_string command;
     if(sc->password) formatstring(command)("connect %s %d \"%s\"", sc->name, sc->port, sc->password);
     else formatstring(command)("connect %s %d", sc->name, sc->port);
     return newstring(command);
