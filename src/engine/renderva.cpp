@@ -1688,8 +1688,8 @@ static void changetexgen(renderstate &cur, int dim, Slot &slot, VSlot &vslot)
 {
     if(cur.texgenslot != &slot || cur.texgenvslot != &vslot)
     {
-        Texture *curtex = !cur.texgenslot || cur.texgenslot->sts.empty() || cur.texgenslot->sts[0].t == 0 ? notexture : cur.texgenslot->sts[0].t,
-                *tex = (slot.sts.empty() || slot.sts[0].t == 0) ? notexture : slot.sts[0].t;
+        Texture *curtex = !cur.texgenslot || cur.texgenslot->sts.empty() /*|| cur.texgenslot->sts[0].t == 0*/ ? notexture : cur.texgenslot->sts[0].t,
+                *tex = (slot.sts.empty()/* || slot.sts[0].t == 0*/) ? notexture : slot.sts[0].t;
         if(!cur.texgenvslot || slot.sts.empty() ||
             (curtex->xs != tex->xs || curtex->ys != tex->ys ||
              cur.texgenvslot->rotation != vslot.rotation || cur.texgenvslot->scale != vslot.scale ||

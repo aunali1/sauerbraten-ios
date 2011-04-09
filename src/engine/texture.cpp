@@ -37,7 +37,7 @@
 
 SDL_Surface *loadsurface(const char *name);
 #ifndef WIN32
-std::safe_string GetBaseAppPath();
+std::string GetBaseAppPath();
 #endif
 
 static void scaletexture(uchar *src, uint sw, uint sh, uint bpp, uint pitch, uchar *dst, uint dw, uint dh) {
@@ -1050,8 +1050,10 @@ static bool texturepvrt(char *&fbuf, const char *tname, Slot::Tex *tex, bool msg
 	if(msg) {
 		renderprogress(loadprogress, file);
 	}
-	char tm[256] = { 0, }, fn[256] = { 0, };
-	std::safe_string Tmp = GetBaseAppPath() + file;
+	char tm[512] = { 0, }, fn[512] = { 0, };
+	safe_string tname2;
+    copystring(tname2, file);
+    std::string Tmp = GetBaseAppPath() + filepath(tname2);
 	strncpy( tm, Tmp.c_str(), strlen((char*)Tmp.c_str()) - 4);
 	sprintf( fn,  "%s.pvr", tm );
 	FILE *f = fopen(fn, "rb");
@@ -1847,11 +1849,21 @@ static void texcombine(Slot &s, int index, Slot::Tex &t, bool forceload = false)
 		return;
 	}
 #if 1
-    int compress = 0;
+	int compress = 0;
+    size_t fsize = 0;
+	char *fbuf = NULL;
+	if(texturepvrt(fbuf, key.getbuf(), NULL, NULL, &compress, fsize)) {
+		if (fbuf != NULL) {
+			t.t = newtexturepvrt(NULL, key.getbuf(), fbuf, 0, true, true, false, compress);
+		} else {
+			t.t = notexture;
+		}
+	}
+    /*int compress = 0;
     ImageData ts;
 	if(texturedata(ts, NULL, &t, true, &compress)) {
 		t.t = newtexture(NULL, key.getbuf(), ts, 0, true, true, false, compress);
-	}
+	}*/
 #else
     int compress = 0;
     ImageData ts;
@@ -2969,7 +2981,7 @@ SDL_Surface *loadsurface(const char *name) {
 #ifdef WIN32
     if(!s) s = IMG_Load(findfile(name, "rb"));
 #else
-	std::safe_string Tmp = GetBaseAppPath() + name;
+	std::string Tmp = GetBaseAppPath() + name;
 	if(!s) s = IMG_Load(Tmp.c_str());
 #endif
     return fixsurfaceformat(s);
