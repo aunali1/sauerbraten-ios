@@ -983,9 +983,16 @@ void checkinput() {
 #endif
                 }
                 break;
+#ifndef __IPHONEOS__
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
 				if (event.type == SDL_MOUSEBUTTONDOWN) {
+#else
+			case SDL_FINGERUP:
+			case SDL_FINGERDOWN:
+				mouseID = event.tfinger.fingerId;
+				if (event.type == SDL_FINGERDOWN) {
+#endif
 					MouseHold = true;
 				} else {
 					MouseHold = false;
@@ -994,7 +1001,8 @@ void checkinput() {
 					lastbut == event.button.button) {
 					break; // why?? get event twice without it
 				}
-                keypress(-event.button.button, event.button.state!=0, 0, mouseID);
+                //keypress(-event.button.button, event.button.state!=0, 0, mouseID);
+				keypress(-1, MouseHold, 0, mouseID);
 #ifdef SUPPORTONSCREENBUTTON
 				float cx, cy;
 				g3d_cursorpos(cx, cy);
@@ -1003,18 +1011,10 @@ void checkinput() {
 				if (cx > ESCAPEX - TOUCHSIZE2 && 
 					cx < ESCAPEX + TOUCHSIZE2 && 
 					cy > ESCAPEY - TOUCHSIZE2 && 
-					cy < ESCAPEY + TOUCHSIZE2) {
+					cy < ESCAPEY + TOUCHSIZE2 &&
+					!MouseHold) {
 					keypress(27, true, 0, 0);
 				}
-				/*if (lastx == -1) {
-					lastx = event.motion.x;
-					lasty = event.motion.y;
-				} else {
-					int dx = event.motion.x - lastx, dy = event.motion.y - lasty;
-					mousemove(dx, dy);
-					lastx = event.motion.x;
-					lasty = event.motion.y;
-				}*/
 #else
 #endif
                 lasttype = event.type;

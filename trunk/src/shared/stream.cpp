@@ -38,9 +38,17 @@ char *makerelpath(const char *dir, const char *file, const char *prefix, const c
     return tmp;
 }
 
+char *filepath(char *s)
+{
+	char *endpart = strchr(s, '&');
+	if(endpart) {
+		*endpart = '\0';
+	}
+	return s;
+}
+
 char *path(char *s)
 {
-//#ifdef WIN32
     for(char *curpart = s;;)
     {
         char *endpart = strchr(curpart, '&');
@@ -77,11 +85,6 @@ char *path(char *s)
         else break;
     }
     return s;
-//#else
-//	safe_string tmp;
-//	copystring(tmp,s);
-//	return concatstring(GetBaseAppPath(), tmp);
-//#endif
 }
 
 char *path(const char *s, bool copy)
