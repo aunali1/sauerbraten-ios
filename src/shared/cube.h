@@ -56,7 +56,7 @@
 #define TOUCHSWAPX 448
 #define TOUCHSWAPY 32
 #define TOUCHSIZE 64
-#define TOUCHRANGE 32
+#define TOUCHRANGE 16
 #define TOUCHSIZE2 32
 #define TOUCHRANGE2 16
 
