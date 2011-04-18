@@ -974,7 +974,7 @@ void checkinput() {
 					g3d_movecursor(event.motion.x, event.motion.y);
 					//g3d_movecursor(dx, dy);
 					if (MouseHold && !OnScreenTouch[mouseID]) {
-						mousemove(dx * 3, dy * 3);
+						mousemove(dx * 9, dy * 9);
 					}
 #else
 					if(!g3d_movecursor(dx, dy)) {
