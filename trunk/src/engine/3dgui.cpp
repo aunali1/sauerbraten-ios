@@ -1147,12 +1147,17 @@ bool menukey(int code, bool isdown, int cooked, int mouseID) {
         return true;
     }
 
-    if(code==-1 && g3d_windowhit(isdown, true)) return true;
-    else if(code==-3 && g3d_windowhit(isdown, false)) return true;
+	if(code==-1 && g3d_windowhit(isdown, true)) {
+		return true;
+	} else 
+	if(code==-3 && g3d_windowhit(isdown, false)) {
+		return true;
+	}
 
     if(fieldmode == FIELDSHOW || !e)
     {
-        if(windowhit) switch(code)
+        if(windowhit) 
+		switch(code)
         {
             case -4: // window "management" 
                 if(isdown)
@@ -1169,7 +1174,9 @@ bool menukey(int code, bool isdown, int cooked, int mouseID) {
                                 windowhit->savedorigin->add(camdir);
                         }
                     }
-                    else windowhit->savedorigin->add(vec(camdir).mul(guipushdist));
+					else {
+						windowhit->savedorigin->add(vec(camdir).mul(guipushdist));
+					}
                 }
                 return true;
             case -5:
@@ -1186,7 +1193,9 @@ bool menukey(int code, bool isdown, int cooked, int mouseID) {
                                 guis2d.last().savedorigin->sub(camdir);
                         }
                     }
-                    else windowhit->savedorigin->sub(vec(camdir).mul(guipushdist));
+					else {
+						windowhit->savedorigin->sub(vec(camdir).mul(guipushdist));
+					}
                 }
                 return true;
         }
@@ -1288,20 +1297,21 @@ int g3d_sort(gui *a, gui *b) { return (int)(a->dist>b->dist)*2-1; }
 
 bool g3d_windowhit(bool on, bool act)
 {
-    extern int cleargui(int n);
+	extern int cleargui(int n);	
     if(act) {
         if(actionon || windowhit) {
             if(on) { 
 				firstx = gui::hitx; 
 				firsty = gui::hity; 
 			}
-            mousebuttons |= (actionon=on) ? G3D_DOWN : G3D_UP;
+            //mousebuttons |= (actionon=on) ? G3D_DOWN : G3D_UP;
+			mousebuttons |= (actionon=on) ? G3D_UP : 0;
         }
     } else 
 	if(!on && windowhit) {
 		cleargui(1);
 	}
-    return (guis2d.length() && hascursor) || (windowhit && !windowhit->gui2d);
+	return (guis2d.length() && hascursor) || (windowhit && !windowhit->gui2d);
 }
 
 void g3d_render()   

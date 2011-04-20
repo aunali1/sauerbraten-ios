@@ -1848,7 +1848,7 @@ static void texcombine(Slot &s, int index, Slot::Tex &t, bool forceload = false)
 	if(t.t) {
 		return;
 	}
-#if LOADPVR
+#ifdef LOADPVR
 	int compress = 0;
     size_t fsize = 0;
 	char *fbuf = NULL;
