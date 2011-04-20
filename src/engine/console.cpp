@@ -551,19 +551,35 @@ void consolekey(int code, bool isdown, int cooked)
 
 extern bool menukey(int code, bool isdown, int cooked, int mouseID);
 
-void keypress(int code, bool isdown, int cooked, int mouseID) {
+bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID) {
     keym *haskey = keyms.access(code);
 	if(haskey && haskey->pressed) {
 		execbind(*haskey, isdown); // allow pressed keys to release
 	} else // 3D GUI mouse button intercept   
-	if(!menukey(code, isdown, cooked, mouseID)) {
+	if(menukey(code, isrelease, cooked, mouseID)) {
+		float cx, cy;
+		g3d_cursorpos(cx, cy);
+		cx = cx * SCREENW;
+		cy = cy * SCREENH;
+		if (isrelease &&
+			cx > ESCAPEX - TOUCHSIZE2 && 
+			cx < ESCAPEX + TOUCHSIZE2 && 
+			cy > ESCAPEY - TOUCHSIZE2 && 
+			cy < ESCAPEY + TOUCHSIZE2) {
+			keym *key = keyms.access(27);
+			execbind(*key, isrelease);
+		}
+		return true;
+	} else {
 #ifdef SUPPORTONSCREENBUTTON
 		if (code >= 0) {
 			if(commandmillis >= 0) {
 				consolekey(code, isdown, cooked);
+				return true;
 			} else 
 			if(haskey) {
 				execbind(*haskey, isdown);
+				return true;
 			}
 		} else {
 			//Check on screen touch
@@ -592,7 +608,7 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 			} else {
 				MovementTouch = false;
 			}
-			if (!SwapTouch && isdown) {
+			if (!SwapTouch && isrelease) {
 				if (cx > TOUCHSWAPX - TOUCHSIZE2 && 
 					cx < TOUCHSWAPX + TOUCHSIZE2 && 
 					cy > TOUCHSWAPY - TOUCHSIZE2 && 
@@ -625,10 +641,6 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 			} else {
 				EscapeTouch = false;
 			}
-			/*if (!FireTouch && isdown) {
-			} else {
-				FireTouch = false;
-			}*/
 			if (MovementTouch) {
 				if (StartTouchX > TOUCHMOVEX + TOUCHRANGE) {
 					keym *key = keyms.access(275);
@@ -646,6 +658,7 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 					keym *key = keyms.access(273);
 					execbind(*key, isdown);
 				}
+				return true;
 			} else {
 				{
 					keym *key = keyms.access(275);
@@ -667,23 +680,26 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 			if (FireTouch) {
 				keym *key = keyms.access(-1);
 				execbind(*key, isdown);
+				return true;
 			} else {
 				//keym *key = keyms.access(-1);
 				//execbind(*key, false);
 			}
 			if (EscapeTouch) {
 				keym *key = keyms.access(27);
-				execbind(*key, isdown);
+				execbind(*key, isrelease);
+				return true;
 			} else {
 				//keym *key = keyms.access(-1);
 				//execbind(*key, false);
 			}
 			if (SwapTouch) {
 				keym *key = keyms.access(-2);
-				execbind(*key, isdown);
+				execbind(*key, isrelease);
+				return true;
 			} else {
-				keym *key = keyms.access(-2);
-				execbind(*key, false);
+				/*keym *key = keyms.access(-2);
+				execbind(*key, false);*/
 			}
 			/*if (cx > 30 && cx < 94 && cy > 30 && cy < 94) {
 				if(commandmillis >= 0) {
@@ -704,6 +720,7 @@ void keypress(int code, bool isdown, int cooked, int mouseID) {
 		}
 #endif
     }
+	return false;
 }
 
 void clear_console() {

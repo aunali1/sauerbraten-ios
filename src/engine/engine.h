@@ -372,7 +372,7 @@ extern void writecfg(const char *name = NULL);
 extern void checksleep(int millis);
 extern void clearsleep(bool clearoverrides = true);
 // console
-extern void keypress(int code, bool isdown, int cooked, int mouseID);
+extern bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID);
 extern int rendercommand(int x, int y, int w);
 extern int renderconsole(int w, int h, int abovehud);
 extern void conoutf(const char *s, ...);

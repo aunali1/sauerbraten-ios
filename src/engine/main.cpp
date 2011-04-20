@@ -1,9 +1,17 @@
 #include "engine.h"
 
+#define MAXTOUCH 11
+bool Hold[MAXTOUCH];
+bool Release[MAXTOUCH];
+bool Down[MAXTOUCH];
+float TouchX[MAXTOUCH];
+float TouchY[MAXTOUCH];
+float MotionX[MAXTOUCH];
+float MotionY[MAXTOUCH];
+int TouchID[MAXTOUCH];
 bool Paused;
 bool gPauseForOpenFeint;
 GLuint _viewRenderbuffer, _viewFramebuffer, _depthRenderbuffer;
-
 float BufferVerts[BUFFERSIZE];
 float BufferTexts[BUFFERSIZE];
 int BufferSize;
@@ -894,6 +902,7 @@ static void resetmousemotion() {
 }
 
 static inline bool skipmousemotion(SDL_Event &event) {
+#ifndef __IPHONEOS__
     if(event.type != SDL_MOUSEMOTION) return true;
 #ifndef WIN32
     if(!(screen->flags & SDL_FULLSCREEN)) {
@@ -902,6 +911,15 @@ static inline bool skipmousemotion(SDL_Event &event) {
 #endif
         if(event.motion.x == screen->w / 2 && event.motion.y == screen->h / 2) return true;  // ignore any motion events generated SDL_WarpMouse
     }
+#endif
+#else
+    if(event.type != SDL_FINGERMOTION) return true;
+    if(!(screen->flags & SDL_FULLSCREEN)) {
+		int dx = (float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW;
+		int dy = (float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH;
+        if(dx == screen->w / 2 && 
+		   dy == screen->h / 2) return true;  // ignore any motion events generated SDL_WarpMouse
+	}
 #endif
     return false;
 }
@@ -913,8 +931,15 @@ static void checkmousemotion(int &dx, int &dy) {
             if(i > 0) events.remove(0, i); 
             return; 
         }
+#ifndef __IPHONEOS__
         dx += event.motion.xrel;
         dy += event.motion.yrel;
+#else
+		int adx = (float)event.tfinger.dx / (1 << (16 - 1)) * SCR_DEFAULTW;
+		int ady = (float)event.tfinger.dy / (1 << (16 - 1)) * SCR_DEFAULTH;
+		dx += adx;
+		dy += ady;
+#endif		
     }
     events.setsize(0);
     SDL_Event event;
@@ -923,105 +948,295 @@ static void checkmousemotion(int &dx, int &dy) {
             events.add(event);
             return;
         }
+#ifndef __IPHONEOS__
         dx += event.motion.xrel;
         dy += event.motion.yrel;
+#else
+		int adx = (float)event.tfinger.dx / (1 << (16 - 1)) * SCR_DEFAULTW;
+		int ady = (float)event.tfinger.dy / (1 << (16 - 1)) * SCR_DEFAULTH;
+		dx += adx;
+		dy += ady;
+#endif		
     }
 }
 
 void checkinput() {
-    SDL_Event event;
-    int lasttype = 0, lastbut = 0, mouseID = 0;
+//    SDL_Event event;
+//    int lasttype = 0, lastbut = 0, mouseID = 0;
+//	static int lastx = -1, lasty = -1;
+//	static bool MouseHold = false;
+//    while(events.length() || SDL_PollEvent(&event)) {
+//		if(events.length()) {
+//			event = events.remove(0);
+//		}
+//#ifndef WIN32
+//		mouseID = 0;
+//#endif
+//        switch(event.type) {
+//            case SDL_QUIT:
+//                quit();
+//                break;
+//#if !defined(WIN32) && !defined(__APPLE__)
+//            case SDL_VIDEORESIZE:
+//                screenres(&event.resize.w, &event.resize.h);
+//                break;
+//#endif
+//            case SDL_KEYDOWN:
+//            case SDL_KEYUP:
+//				keypress(event.key.keysym.sym, event.key.state==SDL_PRESSED, event.key.keysym.unicode, mouseID);
+//                break;
+//            case SDL_ACTIVEEVENT:
+//				if(event.active.state & SDL_APPINPUTFOCUS) {
+//                    inputgrab(grabinput = event.active.gain!=0);
+//				}
+//				if(event.active.state & SDL_APPACTIVE) {
+//                    minimized = !event.active.gain;
+//				}
+//                break;
+//#ifndef __IPHONEOS__
+//            case SDL_MOUSEMOTION:
+//#else
+//			case SDL_FINGERMOTION:
+//#endif
+//                if(ignoremouse) { 
+//					ignoremouse--; 
+//					break; 
+//				}
+//                if(grabinput && !skipmousemotion(event)) {
+//#ifndef __IPHONEOS__
+//                    int dx = event.motion.xrel, dy = event.motion.yrel;
+//#else
+//					int dx = (float)event.tfinger.dx / (1 << (16 - 1)) * SCR_DEFAULTW;
+//					int dy = (float)event.tfinger.dy / (1 << (16 - 1)) * SCR_DEFAULTH;
+//#endif
+//                    checkmousemotion(dx, dy);
+//                    resetmousemotion();
+//#ifdef SUPPORTONSCREENBUTTON
+//#ifndef __IPHONEOS__
+//					g3d_movecursor(event.motion.x, event.motion.y);
+//#else
+//					g3d_movecursor(
+//						(float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW,
+//						(float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH);
+//#endif
+//					//g3d_movecursor(dx, dy);
+//					if (MouseHold && !OnScreenTouch[mouseID]) {
+//						mousemove(dx * 5, dy * 5);
+//					}
+//#else
+//					if(!g3d_movecursor(dx, dy)) {
+//						mousemove(dx, dy);
+//					}
+//#endif
+//                }
+//                break;
+//#ifndef __IPHONEOS__
+//            case SDL_MOUSEBUTTONDOWN:
+//            case SDL_MOUSEBUTTONUP:
+//				if (event.type == SDL_MOUSEBUTTONDOWN) {
+//#else
+//			case SDL_FINGERUP:
+//			case SDL_FINGERDOWN:
+//				mouseID = event.tfinger.fingerId;
+//				if (event.type == SDL_FINGERDOWN) {
+//#endif
+//					MouseHold = true;
+//				} else {
+//					MouseHold = false;
+//				}
+//#ifdef __IPHONEOS__
+//				g3d_movecursor(
+//						   (float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW,
+//						   (float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH);
+//#endif
+//				if (lasttype == event.type && 
+//					lastbut == event.button.button) {
+//					break; // why?? get event twice without it
+//				}
+//                //keypress(-event.button.button, event.button.state!=0, 0, mouseID);
+//				keypress(-1, MouseHold, 0, mouseID);
+//#ifdef SUPPORTONSCREENBUTTON
+//				float cx, cy;
+//				g3d_cursorpos(cx, cy);
+//				cx = cx * SCREENW;
+//				cy = cy * SCREENH;
+//				if (cx > ESCAPEX - TOUCHSIZE2 && 
+//					cx < ESCAPEX + TOUCHSIZE2 && 
+//					cy > ESCAPEY - TOUCHSIZE2 && 
+//					cy < ESCAPEY + TOUCHSIZE2 &&
+//					!MouseHold) {
+//					keypress(27, true, 0, 0);
+//				}
+//#else
+//#endif
+//                lasttype = event.type;
+//                lastbut = event.button.button;
+//                break;
+//        }
+//    }
+	SDL_Event event;
+	float ax, ay, dx, dy, rx, ry;
+	int number, state;
+	int lasttype = 0, lastbut = 0, mouseID = 0;
 	static int lastx = -1, lasty = -1;
 	static bool MouseHold = false;
-    while(events.length() || SDL_PollEvent(&event)) {
-		if(events.length()) {
-			event = events.remove(0);
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case (SDL_QUIT): {
+				quit();
+				break;
+			}
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+			keypress(event.key.keysym.sym, event.key.state==SDL_PRESSED, false, event.key.keysym.unicode, mouseID);
+			break;
+#ifdef __IPHONEOS__
+		case (SDL_FINGERMOTION): {
+				ax = (float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW;
+				ay = (float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH;
+				rx = (float)event.tfinger.dx / (1 << (16 - 1)) * SCR_DEFAULTW;
+				ry = (float)event.tfinger.dy / (1 << (16 - 1)) * SCR_DEFAULTH;
+				number = event.tfinger.fingerId;
+#else
+		case (SDL_MOUSEMOTION): {
+				state = SDL_GetMouseState(&ax, &ay);
+				rx = event.motion.xrel;
+				ry = event.motion.yrel;
+#ifdef WEBOS
+				number = event.motion.which;
+#else
+				number = 0;
+#endif
+#endif
+#ifdef ORIENTATION
+				dx = ay;
+				dy = SCREEN_HEIGHT - ax;
+#else
+				dx = ax;
+				dy = ay;
+#endif
+#ifdef __IPHONEOS__
+				for (int Z = 0; Z < MAXTOUCH; Z++) {
+					if (TouchID[Z] == number) {
+						TouchX[Z] = dx;
+						TouchY[Z] = dy;
+						MotionX[Z] = rx;
+						MotionY[Z] = ry;
+					}
+				}
+#else
+				TouchX[number] = dx;
+				TouchY[number] = dy;
+				MotionX[number] = rx;
+				MotionY[number] = ry;
+#endif
+				break;
+			}
+#ifdef __IPHONEOS__
+		case (SDL_FINGERDOWN): {
+				ax = (float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW;
+				ay = (float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH;
+				number = event.tfinger.fingerId;
+#else
+		case (SDL_MOUSEBUTTONDOWN): {
+				state = SDL_GetMouseState(&ax, &ay);
+#ifdef WEBOS
+				number = event.motion.which;
+#else
+				number = 0;
+#endif
+#endif
+#ifdef ORIENTATION
+				dx = ay;
+				dy = SCREEN_HEIGHT - ax;
+#else
+				dx = ax;
+				dy = ay;
+#endif
+#ifdef __IPHONEOS__
+				for (int Z = 0; Z < MAXTOUCH; Z++) {
+					if (TouchID[Z] == -1) {
+						Hold[Z] = true;
+						Release[Z] = false;
+						Down[Z] = true;
+						TouchID[Z] = number;
+						TouchX[Z] = dx;
+						TouchY[Z] = dy;
+						break;
+					}
+				}
+#else
+				Hold[number] = true;
+				Release[number] = false;
+				Down[number] = true;
+				TouchX[number] = dx;
+				TouchY[number] = dy;
+#endif
+				break;
+			}
+#ifdef __IPHONEOS__
+		case (SDL_FINGERUP): {
+				ax = (float)event.tfinger.x / (1 << (16 - 1)) * SCR_DEFAULTW;
+				ay = (float)event.tfinger.y / (1 << (16 - 1)) * SCR_DEFAULTH;
+				number = event.tfinger.fingerId;
+#else
+		case (SDL_MOUSEBUTTONUP): {
+				state = SDL_GetMouseState(&ax, &ay);
+#ifdef WEBOS
+				number = event.motion.which;
+#else
+				number = 0;
+#endif
+#endif
+#ifdef ORIENTATION
+				dx = ay;
+				dy = SCREEN_HEIGHT - ax;
+#else
+				dx = ax;
+				dy = ay;
+#endif
+#ifdef __IPHONEOS__
+				for (int Z = 0; Z < MAXTOUCH; Z++) {
+					if (TouchID[Z] == number) {
+						Hold[Z] = true;
+						Release[Z] = true;
+						Down[Z] = false;
+						TouchID[Z] = -1;
+						TouchX[Z] = dx;
+						TouchY[Z] = dy;
+						break;
+					}
+				}
+#else
+				Hold[number] = true;
+				Release[number] = true;
+				Down[number] = false;
+				TouchX[number] = dx;
+				TouchY[number] = dy;
+#endif
+				break;
+			}
 		}
-#ifndef WIN32
-		mouseID = 0;
-#endif
-        switch(event.type) {
-            case SDL_QUIT:
-                quit();
-                break;
-#if !defined(WIN32) && !defined(__APPLE__)
-            case SDL_VIDEORESIZE:
-                screenres(&event.resize.w, &event.resize.h);
-                break;
-#endif
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-				keypress(event.key.keysym.sym, event.key.state==SDL_PRESSED, event.key.keysym.unicode, mouseID);
-                break;
-            case SDL_ACTIVEEVENT:
-				if(event.active.state & SDL_APPINPUTFOCUS) {
-                    inputgrab(grabinput = event.active.gain!=0);
-				}
-				if(event.active.state & SDL_APPACTIVE) {
-                    minimized = !event.active.gain;
-				}
-                break;
-            case SDL_MOUSEMOTION:
-                if(ignoremouse) { 
-					ignoremouse--; 
-					break; 
-				}
-                if(grabinput && !skipmousemotion(event)) {
-                    int dx = event.motion.xrel, dy = event.motion.yrel;
-                    checkmousemotion(dx, dy);
-                    resetmousemotion();
-#ifdef SUPPORTONSCREENBUTTON
-					g3d_movecursor(event.motion.x, event.motion.y);
-					//g3d_movecursor(dx, dy);
-					if (MouseHold && !OnScreenTouch[mouseID]) {
-						mousemove(dx * 9, dy * 9);
+	}
+	for (int Z = 0; Z < MAXTOUCH; Z++) {
+		if (Hold[Z]) {
+			g3d_movecursor(TouchX[Z], TouchY[Z]);
+			if (keypress(-1, Down[Z], Release[Z], 0, Z)) {				
+			} else {
+				if (Down[Z]) {
+					if (MotionX[Z] != 0 || MotionY[Z] != 0) {
+						mousemove(MotionX[Z] * 5, MotionY[Z] * 5);
 					}
-#else
-					if(!g3d_movecursor(dx, dy)) {
-						mousemove(dx, dy);
-					}
-#endif
-                }
-                break;
-#ifndef __IPHONEOS__
-            case SDL_MOUSEBUTTONDOWN:
-            case SDL_MOUSEBUTTONUP:
-				if (event.type == SDL_MOUSEBUTTONDOWN) {
-#else
-			case SDL_FINGERUP:
-			case SDL_FINGERDOWN:
-				mouseID = event.tfinger.fingerId;
-				if (event.type == SDL_FINGERDOWN) {
-#endif
-					MouseHold = true;
-				} else {
-					MouseHold = false;
 				}
-                if (lasttype == event.type && 
-					lastbut == event.button.button) {
-					break; // why?? get event twice without it
-				}
-                //keypress(-event.button.button, event.button.state!=0, 0, mouseID);
-				keypress(-1, MouseHold, 0, mouseID);
-#ifdef SUPPORTONSCREENBUTTON
-				float cx, cy;
-				g3d_cursorpos(cx, cy);
-				cx = cx * SCREENW;
-				cy = cy * SCREENH;
-				if (cx > ESCAPEX - TOUCHSIZE2 && 
-					cx < ESCAPEX + TOUCHSIZE2 && 
-					cy > ESCAPEY - TOUCHSIZE2 && 
-					cy < ESCAPEY + TOUCHSIZE2 &&
-					!MouseHold) {
-					keypress(27, true, 0, 0);
-				}
-#else
-#endif
-                lasttype = event.type;
-                lastbut = event.button.button;
-                break;
-        }
-    }
+			}
+			if (Release[Z]) {
+				Hold[Z] = false;
+			}
+			MotionX[Z] = 0;
+			MotionY[Z] = 0;
+			Release[Z] = false;
+		}
+	}
 }
 
 void swapbuffers() {
@@ -1229,7 +1444,12 @@ int SDL_main(int argc, char **argv) {
 #endif
     int usedcolorbits = 0, useddepthbits = 0, usedfsaa = 0;
     setupscreen(usedcolorbits, useddepthbits, usedfsaa);
-
+	for (int z = 0; z < MAXTOUCH; z++) {
+		Hold[z] = false;
+		Release[z] = false;
+		Down[z] = false;
+		TouchID[z] = -1;
+	}
     log("video: misc");
     SDL_WM_SetCaption("Cube 2: Sauerbraten", NULL);
     keyrepeat(false);
