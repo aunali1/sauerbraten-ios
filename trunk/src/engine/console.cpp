@@ -553,6 +553,7 @@ extern bool menukey(int code, bool isdown, int cooked, int mouseID);
 
 bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID) {
     keym *haskey = keyms.access(code);
+	static bool HU = false, HD = false, HL = false, HR = false,  OU = false, OD = false, OL = false, OR = false;
 	if(haskey && haskey->pressed) {
 		execbind(*haskey, isdown); // allow pressed keys to release
 	} else // 3D GUI mouse button intercept   
@@ -595,7 +596,7 @@ bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID) {
 			static bool EscapeTouch = false;
 			static int EscapeTouchX, EscapeTouchY;
 			OnScreenTouch[mouseID] = false;
-			if (!MovementTouch && isdown) {
+			if (!MovementTouch && (isdown || isrelease)) {
 				if (cx > TOUCHMOVEX - TOUCHSIZE && 
 					cx < TOUCHMOVEX + TOUCHSIZE && 
 					cy > TOUCHMOVEY - TOUCHSIZE && 
@@ -642,6 +643,7 @@ bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID) {
 				EscapeTouch = false;
 			}
 			if (MovementTouch) {
+				if (isdown) {
 				if (StartTouchX > TOUCHMOVEX + TOUCHRANGE) {
 					keym *key = keyms.access(275);
 					execbind(*key, isdown);
@@ -657,6 +659,25 @@ bool keypress(int code, bool isdown, bool isrelease, int cooked, int mouseID) {
 				if (StartTouchY < TOUCHMOVEY - TOUCHRANGE) {
 					keym *key = keyms.access(273);
 					execbind(*key, isdown);
+				}
+				}
+				if (isrelease) {
+					{
+						keym *key = keyms.access(275);
+						execbind(*key, false);
+					}
+					{
+						keym *key = keyms.access(276);
+						execbind(*key, false);
+					}
+					{
+						keym *key = keyms.access(274);
+						execbind(*key, false);
+					}
+					{
+						keym *key = keyms.access(273);
+						execbind(*key, false);
+					}
 				}
 				return true;
 			} else {
